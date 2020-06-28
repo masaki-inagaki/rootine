@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 Client clientFromJson(String str) {
   final jsonData = json.decode(str);
   return Client.fromMap(jsonData);
@@ -10,7 +12,7 @@ String clientToJson(Client data) {
   return json.encode(dyn);
 }
 
-class Client {
+class Client with ChangeNotifier {
   int id;
   String lastName;
   bool blocked;
