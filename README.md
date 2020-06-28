@@ -1,6 +1,6 @@
 # ROOTINE
 
-A new Flutter project.
+Flutter project for the routine manager
 
 ## Getting Started
 
