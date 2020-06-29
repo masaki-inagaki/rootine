@@ -34,12 +34,10 @@ class MainBottomNavigation extends StatelessWidget {
         icon: Icon(Icons.add_box),
         label: const Text('ADD A NEW TASK'),
         onPressed: () {
-          //_showNewRootineDialog(context);
           showDialog<void>(
             context: context,
             barrierDismissible: true,
             builder: (buildContext) {
-              //_showNewRootineDialog(context);
               return AddTaskDialog();
             },
           );

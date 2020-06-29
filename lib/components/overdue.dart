@@ -21,10 +21,7 @@ class RootineState extends State<Rootine> {
     );
   }
 
-  // #docregion _buildSuggestions
   Widget _buildOverdueList() {
-    //final model = Provider.of<List<Client>>(context, listen: true);
-    //final model = context.select((TaskList tlist) => tlist.currentList);
     final tlist = context.watch<TaskList>();
     final model = tlist.currentList;
     return ListView.builder(
@@ -53,14 +50,14 @@ class RootineState extends State<Rootine> {
 
             if (direction == DismissDirection.endToStart) {
               DBProvider.db.deleteClient(item.id);
-              model.removeAt(i);
+              //model.removeAt(i);
               Scaffold.of(context).showSnackBar(
-                  SnackBar(content: Text(item.lastName + ' suspended')));
+                  SnackBar(content: Text(item.taskName + ' suspended')));
             } else {
               DBProvider.db.deleteClient(item.id);
-              model.removeAt(i);
+              //model.removeAt(i);
               Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text(item.lastName + ' dismissed'),
+                  content: Text(item.taskName + ' dismissed'),
                   action: SnackBarAction(
                       label: "Undo",
                       onPressed: () {
@@ -69,7 +66,7 @@ class RootineState extends State<Rootine> {
             }
             //});
           },
-          child: buildRow(item.lastName),
+          child: buildRow(item.taskName),
         );
       },
     );

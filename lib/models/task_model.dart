@@ -2,36 +2,36 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-Client clientFromJson(String str) {
+Task clientFromJson(String str) {
   final jsonData = json.decode(str);
-  return Client.fromMap(jsonData);
+  return Task.fromMap(jsonData);
 }
 
-String clientToJson(Client data) {
+String clientToJson(Task data) {
   final dyn = data.toMap();
   return json.encode(dyn);
 }
 
-class Client with ChangeNotifier {
+class Task with ChangeNotifier {
   int id;
-  String lastName;
+  String taskName;
   bool blocked;
 
-  Client({
+  Task({
     this.id,
-    this.lastName,
+    this.taskName,
     this.blocked,
   });
 
-  factory Client.fromMap(Map<String, dynamic> json) => new Client(
+  factory Task.fromMap(Map<String, dynamic> json) => new Task(
         id: json["id"],
-        lastName: json["last_name"],
+        taskName: json["task_name"],
         blocked: json["blocked"] == 1,
       );
 
   Map<String, dynamic> toMap() => {
         "id": id,
-        "last_name": lastName,
+        "task_name": taskName,
         "blocked": blocked,
       };
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/models/task_list.dart';
-//import 'package:ROOTINE/Database.dart';
 
 class AddTaskDialog extends StatelessWidget {
   @override
@@ -39,8 +38,8 @@ class AddTaskDialog extends StatelessWidget {
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
-                    Client _add = new Client();
-                    _add.lastName = titleTextController.text;
+                    Task _add = new Task();
+                    _add.taskName = titleTextController.text;
                     tlist.add(_add);
                     Navigator.pop(context);
                   }
@@ -52,36 +51,3 @@ class AddTaskDialog extends StatelessWidget {
         ));
   }
 }
-
-// class AddList extends StatelessWidget {
-//   final String txt;
-//   AddList({this.txt});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     print("AddListが呼び出されました");
-//     print("txtは、$txt です");
-//     final tlist = context.watch<TaskList>();
-//     //final model = context.select((TaskList tlist) => tlist.currentList);
-//     Client _add = new Client();
-//     _add.lastName = txt;
-//     //DBProvider.db.newClient(_add);
-//     print("追加します");
-//     tlist.add(_add);
-//     return null;
-//   }
-// }
-
-//   void _addList(BuildContext context, bool result, String txt) async {
-//     final tlist = context.watch<TaskList>();
-//     //final model = context.select((TaskList tlist) => tlist.currentList);
-//     print("_addListが呼び出されました");
-//     if (result == true) {
-//       Client _add = new Client();
-//       _add.lastName = txt;
-//       await DBProvider.db.newClient(_add);
-//       print(_add);
-//       tlist.add(_add);
-//     }
-//   }
-// }

@@ -6,9 +6,9 @@ class TaskRepository {
 
   Future getAllTodos() => taskDB.getAllClients();
 
-  Future insertTodo(Client task) => taskDB.newClient(task);
+  Future insertTodo(Task task) => taskDB.newClient(task);
 
-  Future updateTodo(Client task) => taskDB.updateClient(task);
+  Future updateTodo(Task task) => taskDB.updateClient(task);
 
   Future deleteTodoById(int id) => taskDB.deleteClient(id);
 }

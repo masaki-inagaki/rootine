@@ -5,9 +5,9 @@ import 'package:ROOTINE/models/bottom_navigation_model.dart';
 import 'package:ROOTINE/config/const_text.dart';
 import 'package:ROOTINE/components/main_bottom_navigation.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(Rootine());
 
-class MyApp extends StatelessWidget {
+class Rootine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
