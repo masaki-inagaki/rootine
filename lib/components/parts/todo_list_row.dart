@@ -11,11 +11,20 @@ class TodoListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String dayTrailer = "day";
+    if (itm.day > 1) {
+      dayTrailer = dayTrailer + "s";
+    }
     return ListTile(
       title: Text(
         itm.taskName,
         style: ConstStyle.listFont,
       ),
+      subtitle: Text("Interval: " +
+          itm.day.toString() +
+          dayTrailer +
+          ", Due Date: " +
+          itm.dueDate.toString()),
     );
   }
 }

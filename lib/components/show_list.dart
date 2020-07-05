@@ -9,12 +9,10 @@ class ShowTodoList extends StatefulWidget {
 }
 
 class ShowTodoListState extends State<ShowTodoList> {
-
   @override
-  Widget build (BuildContext context) { 
-
+  Widget build(BuildContext context) {
     final tlist = context.watch<TaskList>();
-    final list = tlist.currentList;
+    final list = tlist.allTaskList;
     //final list = context.select((TaskList tlist) => tlist.currentList);
     return Scaffold(
       appBar: AppBar(

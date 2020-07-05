@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ROOTINE/models/task_list.dart';
+import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/config/const_text.dart';
-import 'package:ROOTINE/Database.dart';
 
 class Rootine extends StatefulWidget {
   @override
@@ -24,6 +24,9 @@ class RootineState extends State<Rootine> {
   Widget _buildOverdueList() {
     final tlist = context.watch<TaskList>();
     final model = tlist.currentList;
+    var now = new DateTime.now();
+    var postponeDays = 3;
+
     return ListView.builder(
       padding: const EdgeInsets.all(8.0),
       itemCount: model.length,
@@ -46,16 +49,16 @@ class RootineState extends State<Rootine> {
             }
           },
           onDismissed: (direction) {
-            //setState(() {
-
             if (direction == DismissDirection.endToStart) {
-              DBProvider.db.deleteClient(item.id);
-              //model.removeAt(i);
+              item.dueDate =
+                  new DateTime(now.year, now.month, now.day + postponeDays);
+              tlist.update(item);
               Scaffold.of(context).showSnackBar(
                   SnackBar(content: Text(item.taskName + ' suspended')));
             } else {
-              DBProvider.db.deleteClient(item.id);
-              //model.removeAt(i);
+              item.dueDate =
+                  new DateTime(now.year, now.month, now.day + item.day);
+              tlist.update(item);
               Scaffold.of(context).showSnackBar(SnackBar(
                   content: Text(item.taskName + ' dismissed'),
                   action: SnackBarAction(
@@ -64,9 +67,8 @@ class RootineState extends State<Rootine> {
                         /*Undoのときの処理*/
                       })));
             }
-            //});
           },
-          child: buildRow(item.taskName),
+          child: buildRow(item),
         );
       },
     );
@@ -111,10 +113,10 @@ class RootineState extends State<Rootine> {
         child: Align(alignment: aln, child: Icon(icn)));
   }
 
-  Widget buildRow(String itm) {
+  Widget buildRow(Task task) {
     return ListTile(
       title: Text(
-        itm,
+        task.taskName,
         style: ConstStyle.listFont,
       ),
     );

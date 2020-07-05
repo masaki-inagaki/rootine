@@ -29,47 +29,60 @@ class DBProvider {
       await db.execute("CREATE TABLE Task ("
           "id INTEGER PRIMARY KEY,"
           "task_name TEXT,"
-          "blocked BIT"
+          "blocked BIT,"
+          "day INTEGER,"
+          "due_date TEXT"
           ")");
     });
   }
 
-  newClient(Task newClient) async {
+  newTask(Task newTask) async {
     final db = await database;
     //get the biggest id in the table
     var table = await db.rawQuery("SELECT MAX(id)+1 as id FROM Task");
     int id = table.first["id"];
     //insert to the table using the new id
     var raw = await db.rawInsert(
-        "INSERT Into Task (id,task_name,blocked)"
-        " VALUES (?,?,?)",
-        [id, newClient.taskName, newClient.blocked]);
+        "INSERT Into Task (id,task_name,blocked,day,due_date)"
+        " VALUES (?,?,?,?,?)",
+        //[id, newTask.taskName, newTask.blocked, newTask.day, newTask.dueDate]);
+        [
+          id,
+          newTask.taskName,
+          newTask.blocked,
+          newTask.day,
+          newTask.dueDate.toUtc().toIso8601String()
+        ]);
     return raw;
   }
 
   blockOrUnblock(Task task) async {
     final db = await database;
-    Task blocked =
-        Task(id: task.id, taskName: task.taskName, blocked: !task.blocked);
+    Task blocked = Task(
+        id: task.id,
+        taskName: task.taskName,
+        blocked: !task.blocked,
+        day: task.day,
+        dueDate: task.dueDate);
     var res = await db
         .update("Task", blocked.toMap(), where: "id = ?", whereArgs: [task.id]);
     return res;
   }
 
-  updateClient(Task newClient) async {
+  updateTask(Task newTask) async {
     final db = await database;
-    var res = await db.update("Task", newClient.toMap(),
-        where: "id = ?", whereArgs: [newClient.id]);
+    var res = await db.update("Task", newTask.toMap(),
+        where: "id = ?", whereArgs: [newTask.id]);
     return res;
   }
 
-  getClient(int id) async {
+  getTask(int id) async {
     final db = await database;
     var res = await db.query("Task", where: "id = ?", whereArgs: [id]);
     return res.isNotEmpty ? Task.fromMap(res.first) : null;
   }
 
-  Future<List<Task>> getBlockedClients() async {
+  Future<List<Task>> getBlockedTasks() async {
     final db = await database;
     var res = await db.query("Task", where: "blocked = ? ", whereArgs: [1]);
 
@@ -78,7 +91,7 @@ class DBProvider {
     return list;
   }
 
-  Future<List<Task>> getAllClients() async {
+  Future<List<Task>> getAllTasks() async {
     final db = await database;
     var res = await db.query("Task");
     List<Task> list =
@@ -86,7 +99,7 @@ class DBProvider {
     return list;
   }
 
-  deleteClient(int id) async {
+  deleteTask(int id) async {
     final db = await database;
     return db.delete("Task", where: "id = ?", whereArgs: [id]);
   }

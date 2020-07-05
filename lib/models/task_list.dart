@@ -3,9 +3,10 @@ import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/repositories/task_repository.dart';
 
 class TaskList with ChangeNotifier {
-  List<Task> _allTodoList = [];
-  List<Task> get currentList => _allTodoList;
-  List<Task> get allTaskList => _allTodoList;
+  List<Task> _allTaskList = [];
+  List<Task> _currentList = [];
+  List<Task> get allTaskList => _allTaskList;
+  List<Task> get currentList => _currentList;
 
   final TaskRepository repo = TaskRepository();
 
@@ -14,20 +15,32 @@ class TaskList with ChangeNotifier {
   }
 
   void _fetchAll() async {
-    _allTodoList = await repo.getAllTodos();
+    _allTaskList = await repo.getAllTodos();
+    _currentList = await _filterDue();
     notifyListeners();
+  }
+
+  Future<List<Task>> _filterDue() async {
+    var now = DateTime.now();
+    List<Task> _list = [];
+    for (var task in _allTaskList) {
+      Duration diff =
+          task.dueDate.difference(DateTime(now.year, now.month, now.day));
+      if (diff.inDays <= 2) {
+        _list.add(task);
+      }
+    }
+    return _list;
   }
 
   void add(Task task) async {
     await repo.insertTodo(task);
     _fetchAll();
-    notifyListeners();
   }
 
   void update(Task task) async {
     await repo.updateTodo(task);
     _fetchAll();
-    notifyListeners();
   }
 
   // void toggleIsDone(Client task) async {
