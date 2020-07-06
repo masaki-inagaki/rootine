@@ -1,31 +1,42 @@
 import 'package:flutter/material.dart';
+//import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:ROOTINE/models/task_list.dart';
 import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/config/const_text.dart';
 
-class Rootine extends StatefulWidget {
-  @override
-  RootineState createState() => RootineState();
-}
-
-class RootineState extends State<Rootine> {
+class Rootine extends StatelessWidget {
   final dateTextController = TextEditingController();
-  String _result = "";
+  //String _result = "";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(ConstText.todoTitle), actions: <Widget>[]),
-      body: _buildOverdueList(),
+      body: _buildOverdueList(context),
     );
   }
 
-  Widget _buildOverdueList() {
+  Widget _buildOverdueList(BuildContext context) {
     final tlist = context.watch<TaskList>();
     final model = tlist.currentList;
     var now = new DateTime.now();
-    var postponeDays = 3;
+    var postponeDays = 0;
+
+    if (model.isEmpty) {
+      return Center(
+        //child: Text("aaaa"),
+        //child: Image(image: AssetImage('image/all_done.png')),
+        child: Container(
+          width: 120.0,
+          height: 150.0,
+          child: Column(children: <Widget>[
+            Image(image: AssetImage('image/all_done.png')),
+            Text('Well done!!'),
+          ]),
+        ),
+      );
+    }
 
     return ListView.builder(
       padding: const EdgeInsets.all(8.0),
@@ -44,8 +55,15 @@ class RootineState extends State<Rootine> {
             if (direction == DismissDirection.startToEnd) {
               return true;
             } else {
-              await _showSuspendDialog();
-              return _result != 'Cancel';
+              var result = await _showSuspendDialog(context);
+              //キャンセルが押された場合はFalseを返し、Dismissしない。
+              //return _result != 'Cancel';
+              if (result == 'Cancel') {
+                return false;
+              } else {
+                postponeDays = 3;
+                return true;
+              }
             }
           },
           onDismissed: (direction) {
@@ -53,14 +71,18 @@ class RootineState extends State<Rootine> {
               item.dueDate =
                   new DateTime(now.year, now.month, now.day + postponeDays);
               tlist.update(item);
-              Scaffold.of(context).showSnackBar(
-                  SnackBar(content: Text(item.taskName + ' suspended')));
+              Scaffold.of(context).showSnackBar(SnackBar(
+                  content: Text('This item is suspended for ' +
+                      postponeDays.toString() +
+                      ' days')));
             } else {
               item.dueDate =
                   new DateTime(now.year, now.month, now.day + item.day);
               tlist.update(item);
               Scaffold.of(context).showSnackBar(SnackBar(
-                  content: Text(item.taskName + ' dismissed'),
+                  content: Text('Well done!! Reminds you after ' +
+                      item.day.toString() +
+                      ' days'),
                   action: SnackBarAction(
                       label: "Undo",
                       onPressed: () {
@@ -74,7 +96,7 @@ class RootineState extends State<Rootine> {
     );
   }
 
-  Future _showSuspendDialog() async {
+  Future _showSuspendDialog(BuildContext context) async {
     String result = "";
     result = await showDialog(
       barrierDismissible: true,
@@ -83,18 +105,19 @@ class RootineState extends State<Rootine> {
         return SimpleDialog(
           title: Text("Postpone the task?"),
           children: <Widget>[
-            _buildDialogOption('Tomorrow', ' Tomorrow'),
-            _buildDialogOption('Cancel', 'Cancel'),
+            _buildDialogOption('Tomorrow', ' Tomorrow', context),
+            _buildDialogOption('Cancel', 'Cancel', context),
           ],
         );
       },
     );
     if (result != "") {
-      _result = result;
+      //_result = result;
+      return result;
     }
   }
 
-  Widget _buildDialogOption(String t, String rt) {
+  Widget _buildDialogOption(String t, String rt, BuildContext context) {
     return SimpleDialogOption(
       child: ListTile(
         title: Text(t),

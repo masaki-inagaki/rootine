@@ -16,7 +16,7 @@ class MainBottomNavigation extends StatelessWidget {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.check),
-            title: Text('Overdue Tasks'),
+            title: Text('Todo: Now'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.view_list),

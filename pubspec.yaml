@@ -26,6 +26,7 @@ dependencies:
   sqflite: ^1.2.0
   path_provider: ^1.6.0
   provider: ^4.1.2
+  intl: ^0.16.1
   
   path: 
 
@@ -42,6 +43,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
+  assets:
+    - image/all_done.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

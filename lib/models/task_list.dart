@@ -26,7 +26,7 @@ class TaskList with ChangeNotifier {
     for (var task in _allTaskList) {
       Duration diff =
           task.dueDate.difference(DateTime(now.year, now.month, now.day));
-      if (diff.inDays <= 2) {
+      if (diff.inHours <= 1) {
         _list.add(task);
       }
     }
