@@ -24,9 +24,8 @@ class TaskList with ChangeNotifier {
     var now = DateTime.now();
     List<Task> _list = [];
     for (var task in _allTaskList) {
-      Duration diff =
-          task.dueDate.difference(DateTime(now.year, now.month, now.day));
-      if (diff.inHours <= 1) {
+      Duration diff = task.dueDate.difference(now);
+      if (diff.inHours <= 25) {
         _list.add(task);
       }
     }
@@ -48,7 +47,7 @@ class TaskList with ChangeNotifier {
   //   update(task);
   // }
 
-  void remove(Task task) async {
+  Future remove(Task task) async {
     await repo.deleteTodoById(task.id);
     _fetchAll();
   }

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ROOTINE/models/bottom_navigation_model.dart';
-import 'package:ROOTINE/components/parts/add_task_dialog.dart';
 
 class MainBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    //final bottomNavigationModel = Provider.of<BottomNavigationModel>(context, listen: true);
     final bottomNavigationModel = context.watch<BottomNavigationModel>();
     return Scaffold(
       body: Center(
@@ -28,19 +26,6 @@ class MainBottomNavigation extends StatelessWidget {
         selectedItemColor: Colors.amber[800],
         onTap: (index) {
           bottomNavigationModel.change(index);
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: Icon(Icons.add_box),
-        label: const Text('ADD A NEW TASK'),
-        onPressed: () {
-          showDialog<void>(
-            context: context,
-            barrierDismissible: true,
-            builder: (buildContext) {
-              return AddTaskDialog();
-            },
-          );
         },
       ),
     );

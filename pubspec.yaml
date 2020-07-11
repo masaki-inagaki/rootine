@@ -27,6 +27,8 @@ dependencies:
   path_provider: ^1.6.0
   provider: ^4.1.2
   intl: ^0.16.1
+  flutter_slidable: ^0.5.4
+  styled_text: ^1.0.1
   
   path: 
 
