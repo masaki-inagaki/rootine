@@ -19,10 +19,12 @@ class DeleteConmfirmation extends StatelessWidget {
       actions: <Widget>[
         FlatButton(
           child: Text('Cancel'),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, "Cancel"),
         ),
         FlatButton(
             child: Text('Delete'),
+            color: Colors.blue,
+            textTheme: ButtonTextTheme.primary,
             onPressed: () {
               tlist.remove(task);
               Navigator.pop(context, task.taskName);

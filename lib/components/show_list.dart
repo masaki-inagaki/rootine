@@ -1,4 +1,5 @@
 import 'package:ROOTINE/components/parts/todo_list_view.dart';
+import 'package:ROOTINE/config/const_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ROOTINE/models/task_list.dart';
@@ -11,7 +12,7 @@ class ShowTodoList extends StatelessWidget {
     final list = tlist.allTaskList;
     return Scaffold(
       appBar: AppBar(
-        title: Text('ALL TASKS'),
+        title: Text(ConstText.allTasks),
       ),
       body: TodoListView(list: list),
       floatingActionButton: AddNewTaskButton(),

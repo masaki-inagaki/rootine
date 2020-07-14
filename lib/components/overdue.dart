@@ -5,11 +5,9 @@ import 'package:ROOTINE/components/parts/overdue_empty.dart';
 import 'package:ROOTINE/config/const_text.dart';
 import 'package:ROOTINE/components/parts/dismissible_list.dart';
 import 'package:ROOTINE/components/parts/add_new_task_button.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 
 class Rootine extends StatelessWidget {
-  //final dateTextController = TextEditingController();
-  //String _result = "";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,15 +22,17 @@ class Rootine extends StatelessWidget {
     final list = tlist.currentList;
 
     if (list.isEmpty) {
+      FlutterAppBadger.removeBadge();
       return OverdueEmpty();
     }
+
+    FlutterAppBadger.updateBadgeCount(list.length);
 
     return ListView.builder(
       padding: const EdgeInsets.all(8.0),
       itemCount: list.length,
       itemBuilder: (context, int i) {
-        final task = list[i];
-        return DismissibleList(task: task);
+        return DismissibleList(task: list[i]);
       },
     );
   }

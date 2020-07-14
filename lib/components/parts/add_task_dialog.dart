@@ -9,7 +9,6 @@ class AddTaskDialog extends StatefulWidget {
 }
 
 class AddTaskDialogState extends State<AddTaskDialog> {
-//class AddTaskDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(

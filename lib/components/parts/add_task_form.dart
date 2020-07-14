@@ -19,6 +19,7 @@ class AddTaskForm extends StatelessWidget {
     final timeTextController = TextEditingController();
     final _formKey = GlobalKey<FormState>();
     var now = new DateTime.now();
+    String saveButton = "Add";
 
     if (task != null) {
       titleTextController.text = task.taskName;
@@ -26,6 +27,7 @@ class AddTaskForm extends StatelessWidget {
       final String hour = task.dueDate.hour.toString().padLeft(2, "0");
       final String min = task.dueDate.minute.toString().padLeft(2, "0");
       timeTextController.text = hour + ':' + min;
+      saveButton = "Done";
     }
 
     return Form(
@@ -107,6 +109,8 @@ class AddTaskForm extends StatelessWidget {
               onPressed: () => Navigator.pop(context, 'Cancel'),
               child: Text('Cancel')),
           FlatButton(
+            color: Colors.blue,
+            textTheme: ButtonTextTheme.primary,
             onPressed: () {
               if (_formKey.currentState.validate()) {
                 _formKey.currentState.save();
@@ -131,7 +135,7 @@ class AddTaskForm extends StatelessWidget {
                 Navigator.pop(context, _add.day.toString() + dayTrailer);
               }
             },
-            child: Text('Done'),
+            child: Text(saveButton),
           ),
         ],
       ),

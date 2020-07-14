@@ -20,7 +20,7 @@ class Rootine extends StatelessWidget {
       ],
       child: MaterialApp(
         title: ConstText.appTitle,
-        //home: Rootine(),
+        debugShowCheckedModeBanner: false,
         home: MainBottomNavigation(),
       ),
     );

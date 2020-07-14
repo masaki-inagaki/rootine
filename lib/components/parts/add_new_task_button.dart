@@ -11,7 +11,7 @@ class AddNewTaskButton extends StatelessWidget {
       onPressed: () async {
         result = await showDialog(
           context: context,
-          barrierDismissible: true,
+          barrierDismissible: false,
           builder: (buildContext) {
             return AddTaskDialog();
           },

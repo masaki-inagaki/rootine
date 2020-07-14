@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/repositories/task_repository.dart';
+import 'package:ROOTINE/components/parts/push_notification.dart';
 
 class TaskList with ChangeNotifier {
   List<Task> _allTaskList = [];
@@ -25,7 +26,7 @@ class TaskList with ChangeNotifier {
     List<Task> _list = [];
     for (var task in _allTaskList) {
       Duration diff = task.dueDate.difference(now);
-      if (diff.inHours <= 25) {
+      if (diff.inHours <= 23) {
         _list.add(task);
       }
     }
@@ -35,11 +36,14 @@ class TaskList with ChangeNotifier {
   void add(Task task) async {
     await repo.insertTodo(task);
     _fetchAll();
+    PushNotification(task: task).initializing();
   }
 
   void update(Task task) async {
     await repo.updateTodo(task);
     _fetchAll();
+    PushNotification(task: task).deleting();
+    PushNotification(task: task).initializing();
   }
 
   // void toggleIsDone(Client task) async {
@@ -50,5 +54,6 @@ class TaskList with ChangeNotifier {
   Future remove(Task task) async {
     await repo.deleteTodoById(task.id);
     _fetchAll();
+    PushNotification(task: task).deleting();
   }
 }
