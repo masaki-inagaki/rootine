@@ -76,12 +76,12 @@ class SlidableList extends StatelessWidget {
           onTap: () async {
             result = await showDialog(
               context: context,
-              barrierDismissible: false,
+              barrierDismissible: true,
               builder: (buildContext) {
                 return DeleteConmfirmation(task: task);
               },
             );
-            if (result != "Cancel") {
+            if (result != null) {
               Scaffold.of(context).hideCurrentSnackBar();
               Scaffold.of(context).showSnackBar(
                   SnackBar(content: Text('Deleted the task: ' + result)));

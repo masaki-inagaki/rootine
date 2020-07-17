@@ -43,15 +43,15 @@ class DBProvider {
     int id = table.first["id"];
     //insert to the table using the new id
     var raw = await db.rawInsert(
-        "INSERT Into Task (id,task_name,blocked,day,due_date)"
-        " VALUES (?,?,?,?,?)",
-        //[id, newTask.taskName, newTask.blocked, newTask.day, newTask.dueDate]);
+        "INSERT Into Task (id,task_name,blocked,day,due_date,notice_time)"
+        " VALUES (?,?,?,?,?,?)",
         [
           id,
           newTask.taskName,
           newTask.blocked,
           newTask.day,
-          newTask.dueDate.toUtc().toIso8601String()
+          newTask.dueDate.toUtc().toIso8601String(),
+          newTask.noticeTime
         ]);
     return raw;
   }
@@ -63,7 +63,8 @@ class DBProvider {
         taskName: task.taskName,
         blocked: !task.blocked,
         day: task.day,
-        dueDate: task.dueDate);
+        dueDate: task.dueDate,
+        noticeTime: task.noticeTime);
     var res = await db
         .update("Task", blocked.toMap(), where: "id = ?", whereArgs: [task.id]);
     return res;

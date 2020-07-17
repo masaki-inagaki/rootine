@@ -34,8 +34,9 @@ class TaskList with ChangeNotifier {
   }
 
   void add(Task task) async {
-    await repo.insertTodo(task);
+    int id = await repo.insertTodo(task);
     _fetchAll();
+    task.id = id;
     PushNotification(task: task).initializing();
   }
 

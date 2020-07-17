@@ -6,15 +6,22 @@ class EditTaskDetails extends StatelessWidget {
   final Task task;
   EditTaskDetails({
     Key key,
-    @required this.task,
+    this.task,
   });
 
   @override
   Widget build(BuildContext context) {
+    String barTitle;
+    if (task == null) {
+      barTitle = "Add a new task";
+    } else {
+      barTitle = "Edit: " + task.taskName;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Edit: ' + task.taskName,
+          barTitle,
           overflow: TextOverflow.ellipsis,
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ROOTINE/models/task_list.dart';
-import 'package:ROOTINE/components/parts/overdue_empty.dart';
+import 'package:ROOTINE/components/parts/task_empty.dart';
 import 'package:ROOTINE/config/const_text.dart';
 import 'package:ROOTINE/components/parts/dismissible_list.dart';
 import 'package:ROOTINE/components/parts/add_new_task_button.dart';
@@ -23,7 +23,7 @@ class Rootine extends StatelessWidget {
 
     if (list.isEmpty) {
       FlutterAppBadger.removeBadge();
-      return OverdueEmpty();
+      return TaskEmpty();
     }
 
     FlutterAppBadger.updateBadgeCount(list.length);

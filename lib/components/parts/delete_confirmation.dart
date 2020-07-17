@@ -19,7 +19,7 @@ class DeleteConmfirmation extends StatelessWidget {
       actions: <Widget>[
         FlatButton(
           child: Text('Cancel'),
-          onPressed: () => Navigator.pop(context, "Cancel"),
+          onPressed: () => Navigator.pop(context, null),
         ),
         FlatButton(
             child: Text('Delete'),

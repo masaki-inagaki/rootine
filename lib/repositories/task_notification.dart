@@ -6,10 +6,9 @@ class TaskRepository {
 
   Future getAllTodos() => taskDB.getAllTasks();
 
-  Future insertTodo(Task task) {
-    final id = taskDB.newTask(task);
-    return id;
-  }
+  Future insertTodo(Task task) => taskDB.newTask(task);
+  Future insertNotification(Task task) =>
+      PushNotification(task: task).initializing();
 
   Future updateTodo(Task task) => taskDB.updateTask(task);
 

@@ -18,8 +18,15 @@ class Task with ChangeNotifier {
   bool blocked;
   int day;
   DateTime dueDate;
+  String noticeTime;
 
-  Task({this.id, this.taskName, this.blocked, this.day, this.dueDate});
+  Task(
+      {this.id,
+      this.taskName,
+      this.blocked,
+      this.day,
+      this.dueDate,
+      this.noticeTime});
 
   factory Task.fromMap(Map<String, dynamic> json) => new Task(
         id: json["id"],
@@ -27,6 +34,7 @@ class Task with ChangeNotifier {
         blocked: json["blocked"] == 1,
         day: json["day"],
         dueDate: DateTime.parse(json["due_date"]).toLocal(),
+        noticeTime: json["notice_name"],
       );
 
   Map<String, dynamic> toMap() => {
@@ -35,5 +43,6 @@ class Task with ChangeNotifier {
         "blocked": blocked,
         "day": day,
         "due_date": dueDate.toUtc().toIso8601String(),
+        "notice_time": noticeTime,
       };
 }

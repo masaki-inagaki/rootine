@@ -10,15 +10,14 @@ class AddTaskForm extends StatelessWidget {
     Key key,
     this.task,
   });
+  final titleTextController = TextEditingController();
+  final dayTextController = TextEditingController();
+  final timeTextController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     final tlist = context.watch<TaskList>();
-    final titleTextController = TextEditingController();
-    final dayTextController = TextEditingController();
-    final timeTextController = TextEditingController();
-    final _formKey = GlobalKey<FormState>();
-    var now = new DateTime.now();
     String saveButton = "Add";
 
     if (task != null) {
@@ -34,108 +33,42 @@ class AddTaskForm extends StatelessWidget {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          new TextFormField(
-            controller: titleTextController,
-            enabled: true,
-            maxLength: 40,
-            maxLengthEnforced: true,
-            //obscureText: false,
-            autovalidate: false,
-            autofocus: true,
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(
-                hintText: 'Input task title', labelText: 'Task Title'),
-            validator: (String value) {
-              return value.isEmpty ? 'This field is mandatory' : null;
-            },
-          ),
-          new TextFormField(
-            controller: dayTextController,
-            enabled: true,
-            maxLength: 4,
-            maxLengthEnforced: true,
-            //obscureText: false,
-            autovalidate: false,
-            autofocus: false,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-                hintText: 'Reminds you after xx day(s)',
-                labelText: 'Interval day(s)'),
-            validator: (input) {
-              //return input.isEmpty ? 'This field is mandatory' : null;
-              final isDigitsOnly = int.tryParse(input);
-              if (input.isEmpty) {
-                return 'This field is mandatory';
-              } else if (isDigitsOnly == null) {
-                return 'Input needs to be digits only';
-              } else if (int.parse(input) == 0) {
-                return 'Input should not be zero';
-              } else {
-                return null;
-              }
-            },
-          ),
-          new TextFormField(
-            controller: timeTextController,
-            //initialValue: "00:00",
-            enabled: true,
-            maxLength: 5,
-            maxLengthEnforced: true,
-            //obscureText: false,
-            autovalidate: false,
-            autofocus: false,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-                labelText: 'Notification Time',
-                hintText: '00:00',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.timer),
-                  onPressed: () async {
-                    var time = await _selectTime(context);
-                    timeTextController.text = time.toString();
-                  },
-                )),
-            validator: (input) {
-              final String time = input.replaceAll(':', '');
-              final isDigitsOnly = int.tryParse(time);
-              if (input != null && isDigitsOnly == null) {
-                return 'Input needs to be digits and colon only';
-              } else {
-                return timeChecker(time);
-              }
-            },
-          ),
-          FlatButton(
-              onPressed: () => Navigator.pop(context, 'Cancel'),
-              child: Text('Cancel')),
-          FlatButton(
-            color: Colors.blue,
-            textTheme: ButtonTextTheme.primary,
-            onPressed: () {
-              if (_formKey.currentState.validate()) {
-                _formKey.currentState.save();
-                var time = timeTextController.text.replaceAll(':', '');
-                if (time.length == 3) {
-                  time = '0' + time;
-                }
-                Task _add = new Task();
-                _add.taskName = titleTextController.text;
-                _add.day = int.parse(dayTextController.text);
-                _add.dueDate = new DateTime(
-                    now.year,
-                    now.month,
-                    now.day + int.parse(dayTextController.text),
-                    int.parse(time.substring(0, 2)),
-                    int.parse(time.substring(2, 4)));
-                tlist.add(_add);
-                String dayTrailer = ' day';
-                if (_add.day != 1) {
-                  dayTrailer = dayTrailer + 's';
-                }
-                Navigator.pop(context, _add.day.toString() + dayTrailer);
-              }
-            },
-            child: Text(saveButton),
+          Container(child: _titleForm()),
+          Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: 150,
+                child: _intervalForm(),
+              )),
+          Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: 150,
+                child: _timeForm(context),
+              )),
+          Container(
+            //margin: const EdgeInsets.all(10.0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                width: 200,
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: 90,
+                      margin: const EdgeInsets.only(top: 5.0),
+                      child: FlatButton(
+                          onPressed: () => Navigator.pop(context, 'Cancel'),
+                          child: Text('Cancel')),
+                    ),
+                    Container(
+                        width: 90,
+                        margin: const EdgeInsets.only(top: 5.0),
+                        child: _saveButton(context, saveButton, tlist)),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -172,5 +105,120 @@ class AddTaskForm extends StatelessWidget {
     } else {
       return timeerror;
     }
+  }
+
+  Widget _titleForm() {
+    return new TextFormField(
+      controller: titleTextController,
+      enabled: true,
+      maxLength: 40,
+      maxLengthEnforced: true,
+      autovalidate: false,
+      autofocus: true,
+      keyboardType: TextInputType.text,
+      decoration: const InputDecoration(
+          hintText: 'Input task title', labelText: 'Task Title'),
+      validator: (String value) {
+        return value.isEmpty ? 'Mandatory field' : null;
+      },
+    );
+  }
+
+  Widget _intervalForm() {
+    return new TextFormField(
+      controller: dayTextController,
+      enabled: true,
+      maxLength: 3,
+      maxLengthEnforced: true,
+      //obscureText: false,
+      autovalidate: false,
+      autofocus: false,
+      keyboardType: TextInputType.number,
+      decoration: const InputDecoration(
+          hintText: '1 ~ 999', labelText: 'Interval Day(s)'),
+      validator: (input) {
+        //return input.isEmpty ? 'This field is mandatory' : null;
+        final isDigitsOnly = int.tryParse(input);
+        if (input.isEmpty) {
+          return 'Mandatory field';
+        } else if (isDigitsOnly == null) {
+          return 'Digits only';
+        } else if (int.parse(input) == 0) {
+          return '1 ~ 999';
+        } else {
+          return null;
+        }
+      },
+    );
+  }
+
+  Widget _timeForm(BuildContext context) {
+    return new TextFormField(
+      controller: timeTextController,
+      enabled: true,
+      maxLength: 5,
+      maxLengthEnforced: true,
+      autovalidate: false,
+      autofocus: false,
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+          labelText: 'Notice Time',
+          hintText: '00:00',
+          suffixIcon: IconButton(
+            icon: Icon(Icons.timer),
+            onPressed: () async {
+              var time = await _selectTime(context);
+              timeTextController.text = time.toString();
+            },
+          )),
+      validator: (input) {
+        final String time = input.replaceAll(':', '');
+        final isDigitsOnly = int.tryParse(time);
+        if (input != null && isDigitsOnly == null) {
+          return 'Digits and colon only';
+        } else {
+          return timeChecker(time);
+        }
+      },
+    );
+  }
+
+  Widget _saveButton(
+      BuildContext context, String buttonString, TaskList taskList) {
+    var now = new DateTime.now();
+    return FlatButton(
+      color: Colors.blue,
+      textTheme: ButtonTextTheme.primary,
+      onPressed: () {
+        if (_formKey.currentState.validate()) {
+          _formKey.currentState.save();
+          var time = timeTextController.text.replaceAll(':', '');
+          if (time.length == 3) {
+            time = '0' + time;
+          }
+          Task _add = new Task();
+          _add.taskName = titleTextController.text;
+          _add.day = int.parse(dayTextController.text);
+          _add.dueDate = new DateTime(
+              now.year,
+              now.month,
+              now.day + int.parse(dayTextController.text),
+              int.parse(time.substring(0, 2)),
+              int.parse(time.substring(2, 4)));
+          _add.noticeTime = time;
+          if (_add.id == null) {
+            taskList.add(_add);
+          } else {
+            taskList.update(_add);
+          }
+          String dayTrailer = ' day';
+          if (_add.day != 1) {
+            dayTrailer = dayTrailer + 's';
+          }
+          Navigator.pop(context, _add.day.toString() + dayTrailer);
+        }
+      },
+      child: Text(buttonString),
+    );
   }
 }

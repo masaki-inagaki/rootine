@@ -36,7 +36,10 @@ class DismissibleList extends StatelessWidget {
         } else {
           var result = await _showSuspendDialog(context, task);
           //キャンセルが押された場合はFalseを返し、Dismissしない。
-          if (result == 'Cancel') {
+          if (result == null) {
+            return false;
+          } else if (result == "More") {
+            await _showMoreOptions(context, task);
             return false;
           } else {
             return true;
@@ -59,7 +62,7 @@ class DismissibleList extends StatelessWidget {
           tlist.update(task);
           Scaffold.of(context).hideCurrentSnackBar();
           Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('Well done!! Reminds you after ' +
+              content: Text('Well done!! Reminds you again after ' +
                   task.day.toString() +
                   dayTrailer),
               action: SnackBarAction(
@@ -110,8 +113,37 @@ class DismissibleList extends StatelessWidget {
         return SimpleDialog(
           title: Text("Postpone the task?"),
           children: <Widget>[
-            _buildDialogOption('Tomorrow', ' Tomorrow', context),
-            _buildDialogOption('Cancel', 'Cancel', context),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                height: 80,
+                width: 200,
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      //width: 80,
+                      child: _buildDialogOption('Cancel', null, context,
+                          Colors.white, Colors.black, 50),
+                    ),
+                    Container(
+                      //width: 100,
+                      child: _buildDialogOption('Tomorrow', ' Tomorrow',
+                          context, Colors.blue, Colors.white, 50),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: 20,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  child: _buildDialogOption('More Options', 'More', context,
+                      Colors.white, Colors.black, 20),
+                ),
+              ),
+            ),
           ],
         );
       },
@@ -122,14 +154,70 @@ class DismissibleList extends StatelessWidget {
     }
   }
 
-  Widget _buildDialogOption(String t, String rt, BuildContext context) {
-    return SimpleDialogOption(
-      child: ListTile(
-        title: Text(t),
+  Widget _buildDialogOption(String t, String rt, BuildContext context,
+      Color color, Color textColor, double height) {
+    return ButtonTheme(
+      height: height,
+      child: FlatButton(
+        onPressed: () {
+          Navigator.pop(context, rt);
+        },
+        color: color,
+        child: Text(
+          t,
+          style: TextStyle(color: textColor),
+        ),
       ),
-      onPressed: () {
-        Navigator.pop(context, rt);
+    );
+  }
+
+  Future _showMoreOptions(BuildContext context, Task task) async {
+    String result = "";
+    result = await showDialog(
+      barrierDismissible: true,
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text("Postpone the task?"),
+          children: <Widget>[
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                height: 80,
+                width: 200,
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      //width: 80,
+                      child: _buildDialogOption('Cancel', null, context,
+                          Colors.white, Colors.black, 50),
+                    ),
+                    Container(
+                      //width: 100,
+                      child: _buildDialogOption('Tomorrow', ' Tomorrow',
+                          context, Colors.blue, Colors.white, 50),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: 20,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  child: _buildDialogOption('More Options', 'More', context,
+                      Colors.white, Colors.black, 20),
+                ),
+              ),
+            ),
+          ],
+        );
       },
     );
+    if (result != "") {
+      //_result = result;
+      return result;
+    }
   }
 }
