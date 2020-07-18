@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:ROOTINE/models/task_list.dart';
 import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/config/const_text.dart';
@@ -38,24 +39,34 @@ class DismissibleList extends StatelessWidget {
           //キャンセルが押された場合はFalseを返し、Dismissしない。
           if (result == null) {
             return false;
+            //In case of Pick date and time
           } else if (result == "More") {
-            await _showMoreOptions(context, task);
-            return false;
+            var dtResult = await _chooseDateTime(context, task);
+            //In case cancelled
+            if (dtResult == null) {
+              print('null');
+              return false;
+            } else {
+              task.dueDate = dtResult;
+              tlist.update(task);
+              return true;
+            }
+            //In case Tomorrow is selected
           } else {
+            task.dueDate = task.dueDate.add(new Duration(days: 1));
+            tlist.update(task);
             return true;
           }
         }
       },
-      //スワイプされたときの動作
+
       onDismissed: (direction) {
         if (direction == DismissDirection.endToStart) {
-          task.dueDate = new DateTime(now.year, now.month, now.day + task.day);
-          tlist.update(task);
+          final postpone = TimeDifference(task: task).postpone();
           Scaffold.of(context).hideCurrentSnackBar();
           Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('This item is suspended for ' +
-                  task.day.toString() +
-                  dayTrailer)));
+              content:
+                  Text('This item is suspended for ' + postpone.toString())));
         } else {
           final DateTime oldDateTime = task.dueDate;
           task.dueDate = new DateTime(now.year, now.month, now.day + task.day);
@@ -93,7 +104,7 @@ class DismissibleList extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: ConstStyle.listFont,
         ),
-        trailing: TimeDifference(task: task),
+        trailing: _showDueTime(task),
         onTap: () {
           Navigator.push(
             context,
@@ -139,8 +150,8 @@ class DismissibleList extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
-                  child: _buildDialogOption('More Options', 'More', context,
-                      Colors.white, Colors.black, 20),
+                  child: _buildDialogOption('Pick date and time', 'More',
+                      context, Colors.white, Colors.black, 20),
                 ),
               ),
             ),
@@ -171,53 +182,29 @@ class DismissibleList extends StatelessWidget {
     );
   }
 
-  Future _showMoreOptions(BuildContext context, Task task) async {
-    String result = "";
-    result = await showDialog(
-      barrierDismissible: true,
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: Text("Postpone the task?"),
-          children: <Widget>[
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                height: 80,
-                width: 200,
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      //width: 80,
-                      child: _buildDialogOption('Cancel', null, context,
-                          Colors.white, Colors.black, 50),
-                    ),
-                    Container(
-                      //width: 100,
-                      child: _buildDialogOption('Tomorrow', ' Tomorrow',
-                          context, Colors.blue, Colors.white, 50),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              height: 20,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  child: _buildDialogOption('More Options', 'More', context,
-                      Colors.white, Colors.black, 20),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-    if (result != "") {
-      //_result = result;
-      return result;
+  Widget _showDueTime(Task task) {
+    final list = TimeDifference(task: task).overDue();
+    TextStyle style;
+    if (list[1] == true) {
+      style = TextStyle(color: Colors.blue);
+    } else {
+      style = TextStyle(fontWeight: FontWeight.w900, color: Colors.red);
     }
+    return Text(list[0], style: style);
+  }
+
+  Future _chooseDateTime(BuildContext context, Task task) async {
+    var now = new DateTime.now();
+    DateTime cTime = now.add(new Duration(days: 1));
+    var date;
+
+    date = await DatePicker.showDateTimePicker(context,
+        //showTitleActions: true,
+        minTime: now,
+        currentTime: cTime,
+        locale: LocaleType.en, onConfirm: (date) {
+      return date;
+    });
+    return date;
   }
 }

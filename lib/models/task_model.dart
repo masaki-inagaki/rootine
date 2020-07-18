@@ -15,7 +15,7 @@ String clientToJson(Task data) {
 class Task with ChangeNotifier {
   int id;
   String taskName;
-  bool blocked;
+  bool useTime;
   int day;
   DateTime dueDate;
   String noticeTime;
@@ -23,7 +23,7 @@ class Task with ChangeNotifier {
   Task(
       {this.id,
       this.taskName,
-      this.blocked,
+      this.useTime,
       this.day,
       this.dueDate,
       this.noticeTime});
@@ -31,7 +31,7 @@ class Task with ChangeNotifier {
   factory Task.fromMap(Map<String, dynamic> json) => new Task(
         id: json["id"],
         taskName: json["task_name"],
-        blocked: json["blocked"] == 1,
+        useTime: json["use_time"] == 1,
         day: json["day"],
         dueDate: DateTime.parse(json["due_date"]).toLocal(),
         noticeTime: json["notice_name"],
@@ -40,7 +40,7 @@ class Task with ChangeNotifier {
   Map<String, dynamic> toMap() => {
         "id": id,
         "task_name": taskName,
-        "blocked": blocked,
+        "use_time": useTime,
         "day": day,
         "due_date": dueDate.toUtc().toIso8601String(),
         "notice_time": noticeTime,

@@ -1,43 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:ROOTINE/models/task_model.dart';
 
-class TimeDifference extends StatelessWidget {
+class TimeDifference {
   final Task task;
-  const TimeDifference({
+  TimeDifference({
     Key key,
     @required this.task,
   });
 
-  Widget build(BuildContext context) {
-    final now = DateTime.now();
+  List process(String type) {
     int dueTime;
     String dueTrail;
-    Duration diff = task.dueDate.difference(now);
+    String postponeTrail;
+    Duration diff = task.dueDate.difference(DateTime.now());
+    bool due;
+
+    due = diff.inSeconds > 0 ? true : false;
 
     if (diff.inDays.abs() > 0) {
       dueTime = diff.inDays.abs();
       dueTrail = "d";
-      // dueTrail = dueTime > 1 ? " days" : " day";
+      postponeTrail = dueTime > 1 ? " days" : " day";
     } else if (diff.inHours.abs() > 0) {
       dueTime = diff.inHours.abs();
       dueTrail = "h";
-      // dueTrail = dueTime > 1 ? " hours" : " hour";
+      postponeTrail = dueTime > 1 ? " hours" : " hour";
     } else {
       dueTime = diff.inMinutes.abs();
       dueTrail = "m";
-      // dueTrail = dueTime > 1 ? " minutes" : " minute";
+      postponeTrail = dueTime > 1 ? " minutes" : " minute";
     }
 
-    if (diff.inSeconds > 0) {
-      return Text(
-        "Due: " + dueTime.toString() + dueTrail,
-        style: TextStyle(color: Colors.blue),
-      );
+    if (type == "due") {
+      return ["Due: " + dueTime.toString() + dueTrail, due];
     } else {
-      return Text(
-        "Overdue: " + dueTime.toString() + dueTrail,
-        style: TextStyle(fontWeight: FontWeight.w900, color: Colors.red),
-      );
+      return ["Due: " + dueTime.toString() + postponeTrail, due];
     }
+  }
+
+  List overDue() {
+    return process("due");
+  }
+
+  String postpone() {
+    return process("postpone")[0];
   }
 }

@@ -29,9 +29,10 @@ class DBProvider {
       await db.execute("CREATE TABLE Task ("
           "id INTEGER PRIMARY KEY,"
           "task_name TEXT,"
-          "blocked BIT,"
+          "use_time BIT,"
           "day INTEGER,"
-          "due_date TEXT"
+          "due_date TEXT,"
+          "notice_time TEXT"
           ")");
     });
   }
@@ -43,31 +44,17 @@ class DBProvider {
     int id = table.first["id"];
     //insert to the table using the new id
     var raw = await db.rawInsert(
-        "INSERT Into Task (id,task_name,blocked,day,due_date,notice_time)"
+        "INSERT Into Task (id,task_name,use_time,day,due_date,notice_time)"
         " VALUES (?,?,?,?,?,?)",
         [
           id,
           newTask.taskName,
-          newTask.blocked,
+          newTask.useTime,
           newTask.day,
           newTask.dueDate.toUtc().toIso8601String(),
           newTask.noticeTime
         ]);
     return raw;
-  }
-
-  blockOrUnblock(Task task) async {
-    final db = await database;
-    Task blocked = Task(
-        id: task.id,
-        taskName: task.taskName,
-        blocked: !task.blocked,
-        day: task.day,
-        dueDate: task.dueDate,
-        noticeTime: task.noticeTime);
-    var res = await db
-        .update("Task", blocked.toMap(), where: "id = ?", whereArgs: [task.id]);
-    return res;
   }
 
   updateTask(Task newTask) async {
@@ -81,15 +68,6 @@ class DBProvider {
     final db = await database;
     var res = await db.query("Task", where: "id = ?", whereArgs: [id]);
     return res.isNotEmpty ? Task.fromMap(res.first) : null;
-  }
-
-  Future<List<Task>> getBlockedTasks() async {
-    final db = await database;
-    var res = await db.query("Task", where: "blocked = ? ", whereArgs: [1]);
-
-    List<Task> list =
-        res.isNotEmpty ? res.map((c) => Task.fromMap(c)).toList() : [];
-    return list;
   }
 
   Future<List<Task>> getAllTasks() async {

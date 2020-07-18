@@ -196,26 +196,27 @@ class AddTaskForm extends StatelessWidget {
           if (time.length == 3) {
             time = '0' + time;
           }
-          Task _add = new Task();
-          _add.taskName = titleTextController.text;
-          _add.day = int.parse(dayTextController.text);
-          _add.dueDate = new DateTime(
+          final newTask = new Task();
+          newTask.taskName = titleTextController.text;
+          newTask.day = int.parse(dayTextController.text);
+          newTask.dueDate = new DateTime(
               now.year,
               now.month,
               now.day + int.parse(dayTextController.text),
               int.parse(time.substring(0, 2)),
               int.parse(time.substring(2, 4)));
-          _add.noticeTime = time;
-          if (_add.id == null) {
-            taskList.add(_add);
+          newTask.noticeTime = time;
+          if (task == null) {
+            taskList.add(newTask);
           } else {
-            taskList.update(_add);
+            newTask.id = task.id;
+            taskList.update(newTask);
           }
           String dayTrailer = ' day';
-          if (_add.day != 1) {
+          if (newTask.day != 1) {
             dayTrailer = dayTrailer + 's';
           }
-          Navigator.pop(context, _add.day.toString() + dayTrailer);
+          Navigator.pop(context, newTask.day.toString() + dayTrailer);
         }
       },
       child: Text(buttonString),
