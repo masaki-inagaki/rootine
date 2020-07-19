@@ -21,6 +21,7 @@ class AddTaskForm extends StatelessWidget {
     final tlist = context.watch<TaskList>();
     String saveButton = "Add";
     String noticeday = "First Notice Date";
+    bool showMoreVisibility = false;
 
     if (task != null) {
       titleTextController.text = task.taskName;
@@ -45,41 +46,68 @@ class AddTaskForm extends StatelessWidget {
                 width: 150,
                 child: _intervalForm(),
               )),
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                width: 150,
-                child: _timeForm(context),
-              )),
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                width: 200,
-                child: _firstNoticeDate(context, noticeday),
-              )),
-          Container(
-            //margin: const EdgeInsets.all(10.0),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                width: 200,
+          Visibility(
+            maintainSize: false,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: showMoreVisibility,
+            child: Column(
+              children: <Widget>[
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 150,
+                      child: _timeForm(context),
+                    )),
+                Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      width: 200,
+                      child: _firstNoticeDate(context, noticeday),
+                    )),
+              ],
+            ),
+          ),
+          Row(
+            children: <Widget>[
+              GestureDetector(
+                onTap: () {
+                  showMoreVisibility = !showMoreVisibility;
+                  print("tapped");
+                  print(showMoreVisibility);
+                },
                 child: Row(
                   children: <Widget>[
-                    Container(
-                      width: 90,
-                      margin: const EdgeInsets.only(top: 5.0),
-                      child: FlatButton(
-                          onPressed: () => Navigator.pop(context, 'Cancel'),
-                          child: Text('Cancel')),
-                    ),
-                    Container(
-                        width: 90,
-                        margin: const EdgeInsets.only(top: 5.0),
-                        child: _saveButton(context, saveButton, tlist)),
+                    Text('Show options'),
+                    Icon(Icons.unfold_more),
                   ],
                 ),
               ),
-            ),
+              Container(
+                //margin: const EdgeInsets.all(10.0),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Container(
+                    //width: 200,
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          width: 90,
+                          margin: const EdgeInsets.only(top: 5.0),
+                          child: FlatButton(
+                              onPressed: () => Navigator.pop(context, 'Cancel'),
+                              child: Text('Cancel')),
+                        ),
+                        Container(
+                            width: 90,
+                            margin: const EdgeInsets.only(top: 5.0),
+                            child: _saveButton(context, saveButton, tlist)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
