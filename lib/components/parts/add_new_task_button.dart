@@ -13,7 +13,7 @@ class AddNewTaskButton extends StatelessWidget {
             builder: (context) => EditTaskDetails(),
           ),
         );
-        if (result != 'Cancel') {
+        if (result != null && result != 'Cancel') {
           Scaffold.of(context).hideCurrentSnackBar();
           Scaffold.of(context).showSnackBar(SnackBar(
               content: Text('Task added, will notify after ' + result)));

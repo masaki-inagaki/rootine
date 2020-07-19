@@ -13,12 +13,14 @@ class AddTaskForm extends StatelessWidget {
   final titleTextController = TextEditingController();
   final dayTextController = TextEditingController();
   final timeTextController = TextEditingController();
+  final firstDayController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     final tlist = context.watch<TaskList>();
     String saveButton = "Add";
+    String noticeday = "First Notice Date";
 
     if (task != null) {
       titleTextController.text = task.taskName;
@@ -26,7 +28,10 @@ class AddTaskForm extends StatelessWidget {
       final String hour = task.dueDate.hour.toString().padLeft(2, "0");
       final String min = task.dueDate.minute.toString().padLeft(2, "0");
       timeTextController.text = hour + ':' + min;
+      final DateFormat df = new DateFormat('yyyy-MM-dd');
+      firstDayController.text = df.format(task.dueDate);
       saveButton = "Done";
+      noticeday = "Next Notice Date";
     }
 
     return Form(
@@ -45,6 +50,12 @@ class AddTaskForm extends StatelessWidget {
               child: Container(
                 width: 150,
                 child: _timeForm(context),
+              )),
+          Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: 200,
+                child: _firstNoticeDate(context, noticeday),
               )),
           Container(
             //margin: const EdgeInsets.all(10.0),
@@ -137,7 +148,6 @@ class AddTaskForm extends StatelessWidget {
       decoration: const InputDecoration(
           hintText: '1 ~ 999', labelText: 'Interval Day(s)'),
       validator: (input) {
-        //return input.isEmpty ? 'This field is mandatory' : null;
         final isDigitsOnly = int.tryParse(input);
         if (input.isEmpty) {
           return 'Mandatory field';
@@ -172,13 +182,14 @@ class AddTaskForm extends StatelessWidget {
             },
           )),
       validator: (input) {
-        final String time = input.replaceAll(':', '');
-        final isDigitsOnly = int.tryParse(time);
-        if (input != null && isDigitsOnly == null) {
-          return 'Digits and colon only';
-        } else {
-          return timeChecker(time);
+        if (input.isEmpty) {
+          return null;
         }
+        final String time = input.replaceAll(':', '');
+        if (int.tryParse(time) == null) {
+          return 'Digits and colon only';
+        }
+        return timeChecker(time);
       },
     );
   }
@@ -192,19 +203,30 @@ class AddTaskForm extends StatelessWidget {
       onPressed: () {
         if (_formKey.currentState.validate()) {
           _formKey.currentState.save();
-          var time = timeTextController.text.replaceAll(':', '');
-          if (time.length == 3) {
-            time = '0' + time;
+          var time;
+          if (timeTextController.text.isEmpty ||
+              timeTextController.text == null) {
+            time = "2359";
+          } else {
+            time = timeTextController.text.replaceAll(':', '');
+            if (time.length == 3) {
+              time = '0' + time;
+            }
           }
+          final int mm = int.parse(time.substring(0, 2));
+          final int ss = int.parse(time.substring(2, 4));
+
           final newTask = new Task();
           newTask.taskName = titleTextController.text;
           newTask.day = int.parse(dayTextController.text);
-          newTask.dueDate = new DateTime(
-              now.year,
-              now.month,
-              now.day + int.parse(dayTextController.text),
-              int.parse(time.substring(0, 2)),
-              int.parse(time.substring(2, 4)));
+          if (firstDayController.text.isEmpty) {
+            newTask.dueDate = new DateTime(now.year, now.month,
+                now.day + int.parse(dayTextController.text), mm, ss);
+          } else {
+            final DateTime newDate = DateTime.parse(firstDayController.text);
+            newTask.dueDate =
+                new DateTime(newDate.year, newDate.month, newDate.day, mm, ss);
+          }
           newTask.noticeTime = time;
           if (task == null) {
             taskList.add(newTask);
@@ -221,5 +243,50 @@ class AddTaskForm extends StatelessWidget {
       },
       child: Text(buttonString),
     );
+  }
+
+  Widget _firstNoticeDate(BuildContext context, String noticeday) {
+    return new TextFormField(
+      controller: firstDayController,
+      enabled: true,
+      autovalidate: false,
+      autofocus: false,
+      decoration: InputDecoration(
+          labelText: noticeday,
+          hintText: 'Tap calendar icon',
+          suffixIcon: IconButton(
+            icon: Icon(Icons.calendar_today),
+            onPressed: () async {
+              final DateTime firstDay = await _selectDate(context);
+              if (firstDay != null) {
+                final DateFormat df = new DateFormat('yyyy-MM-dd');
+                firstDayController.text = df.format(firstDay);
+              }
+            },
+          )),
+      validator: (input) {
+        if (input.isEmpty) {
+          return null;
+        } else if (DateTime.tryParse(input) == null) {
+          return 'Incorrect date';
+        } else {
+          return null;
+        }
+      },
+    );
+  }
+
+  Future<DateTime> _selectDate(BuildContext context) async {
+    final DateTime dt = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(new Duration(days: 365)),
+    );
+    if (dt != null) {
+      return dt;
+    } else {
+      return null;
+    }
   }
 }

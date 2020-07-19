@@ -44,7 +44,6 @@ class DismissibleList extends StatelessWidget {
             var dtResult = await _chooseDateTime(context, task);
             //In case cancelled
             if (dtResult == null) {
-              print('null');
               return false;
             } else {
               task.dueDate = dtResult;
