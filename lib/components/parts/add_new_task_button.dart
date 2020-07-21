@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ROOTINE/components/edit_task_details.dart';
+import 'package:ROOTINE/components/parts/all_tasks/edit_task_details.dart';
 import 'package:intl/intl.dart';
 import 'package:ROOTINE/components/parts/misc/datetime.dart';
 

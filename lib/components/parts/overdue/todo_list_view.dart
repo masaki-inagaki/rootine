@@ -1,7 +1,7 @@
-import 'package:ROOTINE/components/parts/slidable_list.dart';
+import 'package:ROOTINE/components/parts/all_tasks/slidable_list.dart';
 import 'package:ROOTINE/models/task_model.dart';
 import 'package:flutter/material.dart';
-import 'package:ROOTINE/components/parts/task_empty.dart';
+import 'package:ROOTINE/components/parts/overdue/task_empty.dart';
 
 class TodoListView extends StatelessWidget {
   final List<Task> list;

@@ -50,10 +50,11 @@ String _intervalFormValidator(input) {
   }
 }
 
-Widget timeForm(BuildContext context, TextEditingController controller) {
+Widget timeForm(
+    BuildContext context, TextEditingController controller, bool useTime) {
   return new TextFormField(
     controller: controller,
-    enabled: true,
+    enabled: useTime,
     maxLength: 5,
     maxLengthEnforced: true,
     autovalidate: false,

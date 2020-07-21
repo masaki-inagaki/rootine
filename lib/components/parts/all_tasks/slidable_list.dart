@@ -1,9 +1,9 @@
-import 'package:ROOTINE/components/parts/delete_confirmation.dart';
+import 'package:ROOTINE/components/parts/all_tasks/delete_confirmation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ROOTINE/config/const_text.dart';
 import 'package:ROOTINE/models/task_model.dart';
-import 'package:ROOTINE/components/edit_task_details.dart';
+import 'package:ROOTINE/components/parts/all_tasks/edit_task_details.dart';
 
 class SlidableList extends StatelessWidget {
   final Task task;

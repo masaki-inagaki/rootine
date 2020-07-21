@@ -4,8 +4,8 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:ROOTINE/models/task_list.dart';
 import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/config/const_text.dart';
-import 'package:ROOTINE/components/parts/time_difference.dart';
-import 'package:ROOTINE/components/edit_task_details.dart';
+import 'package:ROOTINE/components/parts/overdue/time_difference.dart';
+import 'package:ROOTINE/components/parts/all_tasks/edit_task_details.dart';
 
 class DismissibleList extends StatelessWidget {
   final Task task;
@@ -40,7 +40,7 @@ class DismissibleList extends StatelessWidget {
           if (result == null) {
             return false;
             //In case of Pick date and time
-          } else if (result == "More") {
+          } else if (result.toString() == "More") {
             var dtResult = await _chooseDateTime(context, task);
             //In case cancelled
             if (dtResult == null) {
