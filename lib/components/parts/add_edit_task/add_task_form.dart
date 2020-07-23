@@ -22,8 +22,6 @@ class AddTaskFormState extends State<AddTaskForm> {
   bool showMoreVisibility = false;
   int showHideInt = 0;
   bool useTime = false;
-  List<Text> showHidetext = [Text('Show options'), Text('Hide options')];
-  List<Icon> showHideIcon = [Icon(Icons.expand_more), Icon(Icons.expand_less)];
   bool firstTime = true;
 
   @override
@@ -115,6 +113,11 @@ class AddTaskFormState extends State<AddTaskForm> {
   }
 
   Widget _showHideArea() {
+    List<Text> showHidetext = [Text('Show options'), Text('Hide options')];
+    List<Icon> showHideIcon = [
+      Icon(Icons.expand_more),
+      Icon(Icons.expand_less)
+    ];
     return GestureDetector(
       onTap: () {
         setState(() {
