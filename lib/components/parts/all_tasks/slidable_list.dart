@@ -23,8 +23,6 @@ class SlidableList extends StatelessWidget {
     if (task.useTime == true && task.noticeTime != null) {
       noticeTime = task.noticeTime;
     }
-    print(task.useTime);
-    print(task.noticeTime);
 
     final String listSubtitle =
         ("Interval: " + intToDays(task.day) + ", Next due Date: " + dueDate) +

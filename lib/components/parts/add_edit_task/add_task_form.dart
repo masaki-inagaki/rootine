@@ -22,40 +22,49 @@ class AddTaskFormState extends State<AddTaskForm> {
   bool showMoreVisibility = false;
   int showHideInt = 0;
   bool useTime = false;
-  bool firstTime = true;
 
   @override
-  Widget build(BuildContext context) {
-    final tlist = context.watch<TaskList>();
-    final bool existing = widget.task != null;
-
-    if (widget.task != null && firstTime == true) {
+  void initState() {
+    super.initState();
+    if (widget.task != null) {
       titleTextController.text = widget.task.taskName;
       intervalTextController.text = widget.task.day.toString();
       timeTextController.text = widget.task.noticeTime;
       firstDayController.text =
           DateFormat('yyyy-MM-dd').format(widget.task.dueDate);
       useTime = widget.task.useTime;
-      firstTime = false;
     }
+  }
 
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          Container(child: titleForm(titleTextController)),
-          _intervalArea(),
-          _optionFields(context, showMoreVisibility, existing),
-          Container(
-            margin: const EdgeInsets.only(top: 10.0),
-            child: Row(
-              children: <Widget>[
-                _showHideArea(),
-                _buttonArea(context, existing, tlist),
-              ],
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tlist = context.watch<TaskList>();
+    final bool existing = widget.task != null;
+
+    return SingleChildScrollView(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: <Widget>[
+            Container(child: titleForm(titleTextController)),
+            _intervalArea(),
+            _optionFields(context, showMoreVisibility, existing),
+            Container(
+              margin: const EdgeInsets.only(top: 10.0),
+              child: Row(
+                children: <Widget>[
+                  _showHideArea(),
+                  _buttonArea(context, existing, tlist),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -181,8 +190,8 @@ class AddTaskFormState extends State<AddTaskForm> {
           timeTextController.text.isEmpty || timeTextController.text == null
               ? ''
               : timeFormatter(timeTextController.text);
-      final int mm = int.parse(time.substring(0, 2));
-      final int ss = int.parse(time.substring(3, 5));
+      final int mm = time == '' ? 23 : int.parse(time.substring(0, 2));
+      final int ss = time == '' ? 59 : int.parse(time.substring(3, 5));
 
       //set the task parameters
       final newTask = new Task();
@@ -199,7 +208,6 @@ class AddTaskFormState extends State<AddTaskForm> {
       newTask.noticeTime = time;
       newTask.day = int.parse(intervalTextController.text);
 
-      print(newTask.noticeTime);
       if (widget.task == null) {
         tList.add(newTask);
       } else {
