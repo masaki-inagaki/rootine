@@ -29,38 +29,38 @@ class DBProvider {
       await db.execute("CREATE TABLE Task ("
           "id INTEGER PRIMARY KEY,"
           "task_name TEXT,"
-          "use_time BIT,"
           "day INTEGER,"
           "due_date TEXT,"
+          "use_time INTEGER,"
           "notice_time TEXT"
           ")");
     });
   }
 
-  newTask(Task newTask) async {
+  newTask(Task task) async {
     final db = await database;
     //get the biggest id in the table
     var table = await db.rawQuery("SELECT MAX(id)+1 as id FROM Task");
     int id = table.first["id"];
     //insert to the table using the new id
     var raw = await db.rawInsert(
-        "INSERT Into Task (id,task_name,use_time,day,due_date,notice_time)"
+        "INSERT Into Task (id,task_name,day,due_date,use_time,notice_time)"
         " VALUES (?,?,?,?,?,?)",
         [
           id,
-          newTask.taskName,
-          newTask.useTime,
-          newTask.day,
-          newTask.dueDate.toUtc().toIso8601String(),
-          newTask.noticeTime
+          task.taskName,
+          task.day,
+          task.dueDate.toUtc().toIso8601String(),
+          task.useTime ? 1 : 0,
+          task.noticeTime
         ]);
     return raw;
   }
 
-  updateTask(Task newTask) async {
+  updateTask(Task task) async {
     final db = await database;
-    var res = await db.update("Task", newTask.toMap(),
-        where: "id = ?", whereArgs: [newTask.id]);
+    var res = await db
+        .update("Task", task.toMap(), where: "id = ?", whereArgs: [task.id]);
     return res;
   }
 

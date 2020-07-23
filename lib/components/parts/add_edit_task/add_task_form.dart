@@ -4,6 +4,7 @@ import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/models/task_list.dart';
 import 'package:intl/intl.dart';
 import 'package:ROOTINE/components/parts/add_edit_task/form.dart';
+import 'package:ROOTINE/components/parts/misc/datetime.dart';
 
 class AddTaskForm extends StatefulWidget {
   final Task task;
@@ -12,7 +13,6 @@ class AddTaskForm extends StatefulWidget {
   AddTaskFormState createState() => new AddTaskFormState();
 }
 
-// Widgetから呼ばれるStateクラス
 class AddTaskFormState extends State<AddTaskForm> {
   final titleTextController = TextEditingController();
   final intervalTextController = TextEditingController();
@@ -21,26 +21,26 @@ class AddTaskFormState extends State<AddTaskForm> {
   final _formKey = GlobalKey<FormState>();
   bool showMoreVisibility = false;
   int showHideInt = 0;
-  bool useNoticeTime = false;
+  bool useTime = false;
   List<Text> showHidetext = [Text('Show options'), Text('Hide options')];
   List<Icon> showHideIcon = [Icon(Icons.expand_more), Icon(Icons.expand_less)];
+  bool firstTime = true;
 
   @override
   Widget build(BuildContext context) {
     final tlist = context.watch<TaskList>();
-    String saveButton = "Add";
-    String noticeDayTitle = "First Notice Date";
+    final int existingTask = widget.task != null ? 1 : 0;
+    List<String> saveButton = ["Add", 'Done'];
+    List<String> noticeDayTitle = ["First Notice Date", 'Next Notice Date'];
 
-    if (widget.task != null) {
+    if (widget.task != null && firstTime == true) {
       titleTextController.text = widget.task.taskName;
       intervalTextController.text = widget.task.day.toString();
-      final String hour = widget.task.dueDate.hour.toString().padLeft(2, "0");
-      final String min = widget.task.dueDate.minute.toString().padLeft(2, "0");
-      timeTextController.text = hour + ':' + min;
-      final DateFormat df = new DateFormat('yyyy-MM-dd');
-      firstDayController.text = df.format(widget.task.dueDate);
-      saveButton = "Done";
-      noticeDayTitle = "Next Notice Date";
+      timeTextController.text = widget.task.noticeTime;
+      firstDayController.text =
+          DateFormat('yyyy-MM-dd').format(widget.task.dueDate);
+      useTime = widget.task.useTime;
+      firstTime = false;
     }
 
     return Form(
@@ -49,13 +49,14 @@ class AddTaskFormState extends State<AddTaskForm> {
         children: <Widget>[
           Container(child: titleForm(titleTextController)),
           _intervalArea(),
-          _optionFields(context, showMoreVisibility, noticeDayTitle),
+          _optionFields(
+              context, showMoreVisibility, noticeDayTitle[existingTask]),
           Container(
             margin: const EdgeInsets.only(top: 10.0),
             child: Row(
               children: <Widget>[
                 _showHideArea(),
-                _buttonArea(context, saveButton, tlist),
+                _buttonArea(context, saveButton[existingTask], tlist),
               ],
             ),
           ),
@@ -88,10 +89,10 @@ class AddTaskFormState extends State<AddTaskForm> {
               ),
               Container(
                   child: Switch(
-                value: useNoticeTime,
+                value: useTime,
                 onChanged: (value) {
                   setState(() {
-                    useNoticeTime = value;
+                    useTime = value;
                   });
                 },
                 activeTrackColor: Colors.lightGreenAccent,
@@ -103,7 +104,7 @@ class AddTaskFormState extends State<AddTaskForm> {
               alignment: Alignment.centerLeft,
               child: Container(
                 width: 150,
-                child: timeForm(context, timeTextController, useNoticeTime),
+                child: timeForm(context, timeTextController, useTime),
               )),
           Align(
               alignment: Alignment.centerLeft,
@@ -176,21 +177,16 @@ class AddTaskFormState extends State<AddTaskForm> {
     var now = new DateTime.now();
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      var time;
-      if (timeTextController.text.isEmpty || timeTextController.text == null) {
-        time = "2359";
-      } else {
-        time = timeTextController.text.replaceAll(':', '');
-        if (time.length == 3) {
-          time = '0' + time;
-        }
-      }
+      final String time =
+          timeTextController.text.isEmpty || timeTextController.text == null
+              ? ''
+              : timeFormatter(timeTextController.text);
       final int mm = int.parse(time.substring(0, 2));
-      final int ss = int.parse(time.substring(2, 4));
+      final int ss = int.parse(time.substring(3, 5));
 
+      //set the task parameters
       final newTask = new Task();
       newTask.taskName = titleTextController.text;
-      newTask.day = int.parse(intervalTextController.text);
       if (firstDayController.text.isEmpty) {
         newTask.dueDate = new DateTime(now.year, now.month,
             now.day + int.parse(intervalTextController.text), mm, ss);
@@ -199,17 +195,16 @@ class AddTaskFormState extends State<AddTaskForm> {
         newTask.dueDate =
             new DateTime(newDate.year, newDate.month, newDate.day, mm, ss);
       }
-      newTask.useTime = useNoticeTime;
+      newTask.useTime = useTime;
       newTask.noticeTime = time;
+      newTask.day = int.parse(intervalTextController.text);
+
+      print(newTask.noticeTime);
       if (widget.task == null) {
         tList.add(newTask);
       } else {
         newTask.id = widget.task.id;
         tList.update(newTask);
-      }
-      String dayTrailer = ' day';
-      if (newTask.day != 1) {
-        dayTrailer = dayTrailer + 's';
       }
       Navigator.pop(context, newTask.dueDate);
     }

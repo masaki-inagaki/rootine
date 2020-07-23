@@ -16,7 +16,8 @@ class TodoListView extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(8.0),
+      padding:
+          const EdgeInsets.only(top: 4.0, left: 4.0, right: 4.0, bottom: 75.0),
       itemCount: list.length,
       itemBuilder: (BuildContext context, int i) {
         //return TodoListRow(itm: list[i]);

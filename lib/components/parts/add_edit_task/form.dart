@@ -67,7 +67,9 @@ Widget timeForm(
           icon: Icon(Icons.timer),
           onPressed: () async {
             var time = await selectTime(context);
-            controller.text = time.toString();
+            if (time != null) {
+              controller.text = time.toString();
+            }
           },
         )),
     validator: (input) {

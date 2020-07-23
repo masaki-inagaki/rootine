@@ -97,21 +97,29 @@ class DismissibleList extends StatelessWidget {
   }
 
   Widget buildRow(BuildContext context, Task task) {
-    return ListTile(
-        title: Text(
-          task.taskName,
-          overflow: TextOverflow.ellipsis,
-          style: ConstStyle.listFont,
+    // return ListTile(
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.black12),
         ),
-        trailing: _showDueTime(task),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditTaskDetails(task: task),
-            ),
-          );
-        });
+      ),
+      child: ListTile(
+          title: Text(
+            task.taskName,
+            overflow: TextOverflow.ellipsis,
+            style: ConstStyle.listFont,
+          ),
+          trailing: _showDueTime(task),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditTaskDetails(task: task),
+              ),
+            );
+          }),
+    );
   }
 
   Future _showSuspendDialog(BuildContext context, Task task) async {

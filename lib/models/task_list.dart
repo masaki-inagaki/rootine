@@ -26,7 +26,7 @@ class TaskList with ChangeNotifier {
     List<Task> _list = [];
     for (var task in _allTaskList) {
       Duration diff = task.dueDate.difference(now);
-      if (diff.inHours <= 23) {
+      if (diff.inHours <= 25) {
         _list.add(task);
       }
     }
@@ -34,9 +34,8 @@ class TaskList with ChangeNotifier {
   }
 
   void add(Task task) async {
-    int id = await repo.insertTodo(task);
+    task.id = await repo.insertTodo(task);
     _fetchAll();
-    task.id = id;
     PushNotification(task: task).initializing();
   }
 

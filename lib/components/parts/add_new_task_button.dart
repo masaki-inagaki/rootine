@@ -18,11 +18,12 @@ class AddNewTaskButton extends StatelessWidget {
         if (date != null && date != 'Cancel') {
           final DateFormat returnDF = new DateFormat('MMMd');
           final String returnDate = returnDF.format(date);
+          final message = Text('Task added, will notify you on ' +
+              returnDate +
+              dateSuffix(date));
+
           Scaffold.of(context).hideCurrentSnackBar();
-          Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('Task added, will notify on ' +
-                  returnDate +
-                  dateSuffix(date))));
+          Scaffold.of(context).showSnackBar(SnackBar(content: message));
         }
       },
     );

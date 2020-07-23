@@ -29,7 +29,8 @@ class Rootine extends StatelessWidget {
     FlutterAppBadger.updateBadgeCount(list.length);
 
     return ListView.builder(
-      padding: const EdgeInsets.all(8.0),
+      padding:
+          const EdgeInsets.only(top: 4.0, left: 4.0, right: 4.0, bottom: 75.0),
       itemCount: list.length,
       itemBuilder: (context, int i) {
         return DismissibleList(task: list[i]);
