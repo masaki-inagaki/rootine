@@ -29,9 +29,7 @@ class AddTaskFormState extends State<AddTaskForm> {
   @override
   Widget build(BuildContext context) {
     final tlist = context.watch<TaskList>();
-    final int existingTask = widget.task != null ? 1 : 0;
-    List<String> saveButton = ["Add", 'Done'];
-    List<String> noticeDayTitle = ["First Notice Date", 'Next Notice Date'];
+    final bool existing = widget.task != null;
 
     if (widget.task != null && firstTime == true) {
       titleTextController.text = widget.task.taskName;
@@ -49,14 +47,13 @@ class AddTaskFormState extends State<AddTaskForm> {
         children: <Widget>[
           Container(child: titleForm(titleTextController)),
           _intervalArea(),
-          _optionFields(
-              context, showMoreVisibility, noticeDayTitle[existingTask]),
+          _optionFields(context, showMoreVisibility, existing),
           Container(
             margin: const EdgeInsets.only(top: 10.0),
             child: Row(
               children: <Widget>[
                 _showHideArea(),
-                _buttonArea(context, saveButton[existingTask], tlist),
+                _buttonArea(context, existing, tlist),
               ],
             ),
           ),
@@ -74,7 +71,7 @@ class AddTaskFormState extends State<AddTaskForm> {
         ));
   }
 
-  Widget _optionFields(BuildContext context, bool show, String labelTitle) {
+  Widget _optionFields(BuildContext context, bool show, bool existing) {
     return Visibility(
       maintainSize: false,
       maintainAnimation: true,
@@ -110,7 +107,7 @@ class AddTaskFormState extends State<AddTaskForm> {
               alignment: Alignment.centerLeft,
               child: Container(
                 width: 200,
-                child: firstNoticeDate(context, labelTitle, firstDayController),
+                child: firstNoticeDate(context, existing, firstDayController),
               )),
         ],
       ),
@@ -134,7 +131,7 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Widget _buttonArea(BuildContext context, String button, TaskList tlist) {
+  Widget _buttonArea(BuildContext context, bool existing, TaskList tlist) {
     return Container(
       child: Align(
         alignment: Alignment.centerRight,
@@ -153,7 +150,7 @@ class AddTaskFormState extends State<AddTaskForm> {
                   width: 90,
                   height: 50,
                   margin: const EdgeInsets.only(top: 5.0),
-                  child: _saveButton(context, button, tlist)),
+                  child: _saveButton(context, existing, tlist)),
             ],
           ),
         ),
@@ -161,15 +158,15 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Widget _saveButton(
-      BuildContext context, String buttonString, TaskList tList) {
+  Widget _saveButton(BuildContext context, bool existing, TaskList tList) {
+    List<String> saveButton = ["Add", 'Done'];
     return FlatButton(
       color: Colors.blue,
       textTheme: ButtonTextTheme.primary,
       onPressed: () {
         _saveTask(context, tList);
       },
-      child: Text(buttonString),
+      child: Text(saveButton[existing ? 1 : 0]),
     );
   }
 

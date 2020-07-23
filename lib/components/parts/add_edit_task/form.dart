@@ -86,14 +86,15 @@ Widget timeForm(
 }
 
 Widget firstNoticeDate(
-    BuildContext context, String labelText, TextEditingController controller) {
+    BuildContext context, bool existing, TextEditingController controller) {
+  List<String> noticeDayTitle = ["First Notice Date", 'Next Notice Date'];
   return new TextFormField(
     controller: controller,
     enabled: true,
     autovalidate: false,
     autofocus: false,
     decoration: InputDecoration(
-        labelText: labelText,
+        labelText: noticeDayTitle[existing ? 1 : 0],
         hintText: 'Tap calendar icon',
         suffixIcon: IconButton(
           icon: Icon(Icons.calendar_today),
