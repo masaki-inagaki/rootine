@@ -6,6 +6,9 @@ import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/config/const_text.dart';
 import 'package:ROOTINE/components/parts/overdue/time_difference.dart';
 import 'package:ROOTINE/components/parts/all_tasks/edit_task_details.dart';
+import 'package:ROOTINE/language/app_local.dart';
+import 'package:ROOTINE/models/settings_list.dart';
+import 'package:ROOTINE/language/messages.dart';
 
 class DismissibleList extends StatelessWidget {
   final Task task;
@@ -16,13 +19,17 @@ class DismissibleList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sList = context.watch<SettingsList>();
+    final currentLang = sList.languageSettings;
+
+    if (currentLang == null) {
+      return CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Colors.white));
+    }
+    Messages msg = Lang(lang: currentLang.value).current(context);
+
     var now = new DateTime.now();
     final tlist = context.watch<TaskList>();
-    String dayTrailer = ' day';
-    if (task.day != 1) {
-      dayTrailer = dayTrailer + 's';
-    }
-
     return Dismissible(
       key: ObjectKey(task),
       /*スワイプ時の背景の設定*/
@@ -35,7 +42,7 @@ class DismissibleList extends StatelessWidget {
         if (direction == DismissDirection.startToEnd) {
           return true;
         } else {
-          var result = await _showSuspendDialog(context, task);
+          var result = await _showSuspendDialog(context, task, msg);
           //キャンセルが押された場合はFalseを返し、Dismissしない。
           if (result == null) {
             return false;
@@ -47,13 +54,13 @@ class DismissibleList extends StatelessWidget {
               return false;
             } else {
               task.dueDate = dtResult;
-              tlist.update(task);
+              tlist.update(task, context, msg);
               return true;
             }
             //In case Tomorrow is selected
           } else {
             task.dueDate = task.dueDate.add(new Duration(days: 1));
-            tlist.update(task);
+            tlist.update(task, context, msg);
             return true;
           }
         }
@@ -69,18 +76,16 @@ class DismissibleList extends StatelessWidget {
         } else {
           final DateTime oldDateTime = task.dueDate;
           task.dueDate = new DateTime(now.year, now.month, now.day + task.day);
-          tlist.update(task);
+          tlist.update(task, context, msg);
           Scaffold.of(context).hideCurrentSnackBar();
           Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('Well done!! Reminds you again after ' +
-                  task.day.toString() +
-                  dayTrailer),
+              content: Text(msg.snackbar['wellDone'](task.day)),
               action: SnackBarAction(
-                  label: "Undo",
+                  label: msg.snackbar['undo'],
                   onPressed: () {
                     /*Undoのときの処理*/
                     task.dueDate = oldDateTime;
-                    tlist.update(task);
+                    tlist.update(task, context, msg);
                   })));
         }
       },
@@ -110,7 +115,7 @@ class DismissibleList extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: ConstStyle.listFont,
           ),
-          trailing: _showDueTime(task),
+          trailing: _showDueTime(task, context),
           onTap: () {
             Navigator.push(
               context,
@@ -122,14 +127,15 @@ class DismissibleList extends StatelessWidget {
     );
   }
 
-  Future _showSuspendDialog(BuildContext context, Task task) async {
+  Future _showSuspendDialog(
+      BuildContext context, Task task, Messages msg) async {
     String result = "";
     result = await showDialog(
       barrierDismissible: true,
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: Text("Postpone the task?"),
+          title: Text(msg.postpone['alertMessage']),
           children: <Widget>[
             Align(
               alignment: Alignment.centerRight,
@@ -140,13 +146,13 @@ class DismissibleList extends StatelessWidget {
                   children: <Widget>[
                     Container(
                       //width: 80,
-                      child: _buildDialogOption('Cancel', null, context,
-                          Colors.white, Colors.black, 50),
+                      child: _buildDialogOption(msg.postpone['cancel'], null,
+                          context, Colors.white, Colors.black, 50),
                     ),
                     Container(
                       //width: 100,
-                      child: _buildDialogOption('Tomorrow', ' Tomorrow',
-                          context, Colors.blue, Colors.white, 50),
+                      child: _buildDialogOption(msg.postpone['tomorrow'],
+                          ' Tomorrow', context, Colors.blue, Colors.white, 50),
                     ),
                   ],
                 ),
@@ -157,8 +163,8 @@ class DismissibleList extends StatelessWidget {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
-                  child: _buildDialogOption('Pick date and time', 'More',
-                      context, Colors.white, Colors.black, 20),
+                  child: _buildDialogOption(msg.postpone['pickTimeDate'],
+                      'More', context, Colors.white, Colors.black, 20),
                 ),
               ),
             ),
@@ -189,15 +195,27 @@ class DismissibleList extends StatelessWidget {
     );
   }
 
-  Widget _showDueTime(Task task) {
-    final list = TimeDifference(task: task).overDue();
-    TextStyle style;
-    if (list[1] == true) {
-      style = TextStyle(color: Colors.blue);
-    } else {
-      style = TextStyle(fontWeight: FontWeight.w900, color: Colors.red);
+  Widget _showDueTime(Task task, BuildContext context) {
+    final sList = context.watch<SettingsList>();
+    final currentLang = sList.languageSettings;
+
+    if (currentLang == null) {
+      return CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Colors.white));
     }
-    return Text(list[0], style: style);
+
+    Messages msg = Lang(lang: currentLang.value).current(context);
+
+    final list = TimeDifference(task: task).due();
+    TextStyle style;
+    if (list[2] == true) {
+      style = TextStyle(color: Colors.blue);
+      return Text(msg.dueTime['due'] + list[0] + msg.dueTime[list[1]],
+          style: style);
+    }
+    style = TextStyle(fontWeight: FontWeight.w900, color: Colors.red);
+    return Text(msg.dueTime['overdue'] + list[0] + msg.dueTime[list[1]],
+        style: style);
   }
 
   Future _chooseDateTime(BuildContext context, Task task) async {

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:ROOTINE/models/task_model.dart';
-import 'package:ROOTINE/models/settings_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBProvider {
@@ -24,7 +23,7 @@ class DBProvider {
 
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = p.join(documentsDirectory.toString(), "rootine.db");
+    String path = p.join(documentsDirectory.toString(), "rootine_settings.db");
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute("CREATE TABLE Task ("
@@ -35,18 +34,6 @@ class DBProvider {
           "use_time INTEGER,"
           "notice_time TEXT"
           ")");
-      await db.execute("CREATE TABLE Settings ("
-          "item TEXT,"
-          "value TEXT"
-          ")");
-      await db.rawInsert(
-          "INSERT Into Settings (item,value)"
-          "VALUES (?,?)",
-          ['language', '']);
-      await db.rawInsert(
-          "INSERT Into Settings (item,value)"
-          "VALUES (?,?)",
-          ['notice_time', 'test2']);
     });
   }
 
@@ -99,35 +86,5 @@ class DBProvider {
   deleteAll() async {
     final db = await database;
     db.rawDelete("Delete * from Task");
-  }
-
-  newSettings(Settings settings) async {
-    final db = await database;
-    var raw = await db.rawInsert(
-        "INSERT Into Settings (item,value)"
-        " VALUES (?,?)",
-        [settings.item, settings.value]);
-    return raw;
-  }
-
-  updateSettings(Settings settings) async {
-    final db = await database;
-    var res = await db.update("Settings", settings.toMap(),
-        where: "item= ?", whereArgs: [settings.item]);
-    return res;
-  }
-
-  getSettings(String item) async {
-    final db = await database;
-    var res = await db.query("Settings", where: "item = ?", whereArgs: [item]);
-    return res.isNotEmpty ? Settings.fromMap(res.first) : null;
-  }
-
-  Future<List<Settings>> getAllSettings() async {
-    final db = await database;
-    var res = await db.query("Settings");
-    List<Settings> list =
-        res.isNotEmpty ? res.map((c) => Settings.fromMap(c)).toList() : [];
-    return list;
   }
 }

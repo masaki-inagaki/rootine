@@ -2,8 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:ROOTINE/components/parts/misc/datetime.dart';
 import 'package:ROOTINE/components/parts/add_edit_task/select_time.dart';
 import 'package:intl/intl.dart';
+import 'package:ROOTINE/language/app_local.dart';
+import 'package:ROOTINE/language/messages.dart';
+import 'package:provider/provider.dart';
+import 'package:ROOTINE/models/settings_list.dart';
 
-Widget titleForm(TextEditingController controller) {
+Widget titleForm(TextEditingController controller, BuildContext context) {
+  final sList = context.watch<SettingsList>();
+  final currentLang = sList.languageSettings;
+
+  if (currentLang == null) {
+    return CircularProgressIndicator(
+        valueColor: new AlwaysStoppedAnimation<Color>(Colors.white));
+  }
+
+  Messages msg = Lang(lang: currentLang.value).current(context);
   return new TextFormField(
     controller: controller,
     enabled: true,
@@ -12,15 +25,17 @@ Widget titleForm(TextEditingController controller) {
     autovalidate: false,
     autofocus: true,
     keyboardType: TextInputType.text,
-    decoration: const InputDecoration(
-        hintText: 'Input task title', labelText: 'Task Title'),
+    decoration: InputDecoration(
+        hintText: msg.newTask['taskTitleHint'],
+        labelText: msg.newTask['taskTitle']),
     validator: (String value) {
-      return value.isEmpty ? 'Mandatory field' : null;
+      return value.isEmpty ? msg.newTask['mandatory'] : null;
     },
   );
 }
 
-Widget intervalForm(TextEditingController controller) {
+Widget intervalForm(
+    TextEditingController controller, BuildContext context, Messages msg) {
   return new TextFormField(
     controller: controller,
     enabled: true,
@@ -29,29 +44,30 @@ Widget intervalForm(TextEditingController controller) {
     autovalidate: false,
     autofocus: false,
     keyboardType: TextInputType.number,
-    decoration: const InputDecoration(
-        hintText: '1 ~ 999', labelText: 'Interval Day(s)'),
+    decoration: InputDecoration(
+        hintText: msg.newTask['intervalDaysHint'],
+        labelText: msg.newTask['intervalDays']),
     validator: (input) {
-      return _intervalFormValidator(input);
+      return _intervalFormValidator(input, context, msg);
     },
   );
 }
 
-String _intervalFormValidator(input) {
+String _intervalFormValidator(input, BuildContext context, Messages msg) {
   final isDigitsOnly = int.tryParse(input);
   if (input.isEmpty) {
-    return 'Mandatory field';
+    return msg.newTask['mandatory'];
   } else if (isDigitsOnly == null) {
-    return 'Digits only';
+    return msg.newTask['digitsOnly'];
   } else if (int.parse(input) == 0) {
-    return '1 ~ 999';
+    return msg.newTask['intervalDaysHint'];
   } else {
     return null;
   }
 }
 
-Widget timeForm(
-    BuildContext context, TextEditingController controller, bool useTime) {
+Widget timeForm(BuildContext context, TextEditingController controller,
+    bool useTime, Messages msg) {
   return new TextFormField(
     controller: controller,
     enabled: useTime,
@@ -61,8 +77,8 @@ Widget timeForm(
     autofocus: false,
     keyboardType: TextInputType.number,
     decoration: InputDecoration(
-        labelText: 'Notice Time',
-        hintText: '00:00',
+        labelText: msg.newTask['noticeTime'],
+        hintText: msg.newTask['noticeTimeHint'],
         suffixIcon: IconButton(
           icon: Icon(Icons.timer),
           onPressed: () async {
@@ -78,16 +94,28 @@ Widget timeForm(
       }
       final String time = input.replaceAll(':', '');
       if (int.tryParse(time) == null) {
-        return 'Digits and colon only';
+        return msg.newTask['digitsColonOnly'];
       }
-      return timeValidator(time) ? null : "Input time is wrong";
+      return timeValidator(time) ? null : msg.newTask['wrongTime'];
     },
   );
 }
 
 Widget firstNoticeDate(
     BuildContext context, bool existing, TextEditingController controller) {
-  List<String> noticeDayTitle = ["First Notice Date", 'Next Notice Date'];
+  final sList = context.watch<SettingsList>();
+  final currentLang = sList.languageSettings;
+
+  if (currentLang == null) {
+    return CircularProgressIndicator(
+        valueColor: new AlwaysStoppedAnimation<Color>(Colors.white));
+  }
+  Messages msg = Lang(lang: currentLang.value).current(context);
+
+  List<String> noticeDayTitle = [
+    msg.newTask['firstNoticeDate'],
+    msg.newTask['nextNoticeDate']
+  ];
   return new TextFormField(
     controller: controller,
     enabled: true,
@@ -95,7 +123,7 @@ Widget firstNoticeDate(
     autofocus: false,
     decoration: InputDecoration(
         labelText: noticeDayTitle[existing ? 1 : 0],
-        hintText: 'Tap calendar icon',
+        hintText: msg.newTask['tapCalendar'],
         suffixIcon: IconButton(
           icon: Icon(Icons.calendar_today),
           onPressed: () async {
@@ -110,7 +138,7 @@ Widget firstNoticeDate(
       if (input.isEmpty) {
         return null;
       } else if (DateTime.tryParse(input) == null) {
-        return 'Incorrect date';
+        return msg.newTask['wrongDate'];
       } else {
         return null;
       }

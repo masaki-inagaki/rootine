@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ROOTINE/models/task_model.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:ROOTINE/language/messages.dart';
+//import 'package:path/path.dart';
 
 class PushNotification {
   final Task task;
@@ -9,11 +11,12 @@ class PushNotification {
     @required this.task,
   });
 
-  void initializing() {
-    _showNotification(task);
+  void initializing(BuildContext context, Messages msg) {
+    _showNotification(task, context, msg);
   }
 
-  Future _showNotification(Task task) async {
+  Future _showNotification(
+      Task task, BuildContext context, Messages msg) async {
     var initializationSettingsAndroid =
         new AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = new IOSInitializationSettings();
@@ -31,8 +34,8 @@ class PushNotification {
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.schedule(
       task.id,
-      'Task overdue: ' + task.taskName,
-      "Let's complete the task now.",
+      msg.notification['overdue'] + ': ' + task.taskName,
+      msg.notification['overdueMessage'],
       time,
       platformChannelSpecifics,
       payload: 'Default_Sound',

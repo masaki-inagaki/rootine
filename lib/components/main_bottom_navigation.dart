@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ROOTINE/models/bottom_navigation_model.dart';
+import 'package:ROOTINE/components/parts/appbar.dart';
 
 class MainBottomNavigation extends StatelessWidget {
   @override
@@ -9,12 +10,10 @@ class MainBottomNavigation extends StatelessWidget {
     return BottomNavigationBar(
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.check),
-          title: Text('Todo: Now'),
-        ),
+            icon: Icon(Icons.check), title: AppBarTitle(i: 0)),
         BottomNavigationBarItem(
           icon: Icon(Icons.view_list),
-          title: Text('All Tasks'),
+          title: AppBarTitle(i: 1),
         ),
       ],
       type: BottomNavigationBarType.fixed,

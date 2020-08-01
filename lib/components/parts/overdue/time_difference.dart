@@ -32,13 +32,12 @@ class TimeDifference {
     }
 
     if (type == "due") {
-      return ["Due: " + dueTime.toString() + dueTrail, due];
-    } else {
-      return ["Due: " + dueTime.toString() + postponeTrail, due];
+      return [dueTime.toString(), dueTrail, due];
     }
+    return [dueTime.toString(), postponeTrail, due];
   }
 
-  List overDue() {
+  List due() {
     return process("due");
   }
 

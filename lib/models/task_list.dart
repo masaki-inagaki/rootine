@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ROOTINE/models/task_model.dart';
 import 'package:ROOTINE/repositories/task_repository.dart';
 import 'package:ROOTINE/components/parts/push_notification.dart';
+import 'package:ROOTINE/language/messages.dart';
 
 class TaskList with ChangeNotifier {
   List<Task> _allTaskList = [];
@@ -33,17 +34,17 @@ class TaskList with ChangeNotifier {
     return _list;
   }
 
-  void add(Task task) async {
+  void add(Task task, BuildContext context, Messages msg) async {
     task.id = await repo.insertTodo(task);
     _fetchAll();
-    PushNotification(task: task).initializing();
+    PushNotification(task: task).initializing(context, msg);
   }
 
-  void update(Task task) async {
+  void update(Task task, BuildContext context, Messages msg) async {
     await repo.updateTodo(task);
     _fetchAll();
     PushNotification(task: task).deleting();
-    PushNotification(task: task).initializing();
+    PushNotification(task: task).initializing(context, msg);
   }
 
   // void toggleIsDone(Client task) async {

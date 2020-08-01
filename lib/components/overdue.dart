@@ -11,12 +11,15 @@ class OverDue extends StatelessWidget {
     final tlist = context.watch<TaskList>();
     final list = tlist.currentList;
 
+    if (list == null) {
+      return CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Colors.white));
+    }
+
     if (list.isEmpty) {
       FlutterAppBadger.removeBadge();
       return TaskEmpty();
     }
-
-    FlutterAppBadger.updateBadgeCount(list.length);
 
     return ListView.builder(
       padding:

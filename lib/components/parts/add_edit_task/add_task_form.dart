@@ -5,6 +5,9 @@ import 'package:ROOTINE/models/task_list.dart';
 import 'package:intl/intl.dart';
 import 'package:ROOTINE/components/parts/add_edit_task/form.dart';
 import 'package:ROOTINE/components/parts/misc/datetime.dart';
+import 'package:ROOTINE/language/app_local.dart';
+import 'package:ROOTINE/models/settings_list.dart';
+import 'package:ROOTINE/language/messages.dart';
 
 class AddTaskForm extends StatefulWidget {
   final Task task;
@@ -45,21 +48,30 @@ class AddTaskFormState extends State<AddTaskForm> {
   Widget build(BuildContext context) {
     final tlist = context.watch<TaskList>();
     final bool existing = widget.task != null;
+    final sList = context.watch<SettingsList>();
+    final currentLang = sList.languageSettings;
+
+    if (currentLang == null || tlist == null) {
+      return CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Colors.white));
+    }
+
+    Messages msg = Lang(lang: currentLang.value).current(context);
 
     return SingleChildScrollView(
       child: Form(
         key: _formKey,
         child: Column(
           children: <Widget>[
-            Container(child: titleForm(titleTextController)),
-            _intervalArea(),
-            _optionFields(context, showMoreVisibility, existing),
+            Container(child: titleForm(titleTextController, context)),
+            _intervalArea(context, msg),
+            _optionFields(context, showMoreVisibility, existing, msg),
             Container(
               margin: const EdgeInsets.only(top: 10.0),
               child: Row(
                 children: <Widget>[
-                  _showHideArea(),
-                  _buttonArea(context, existing, tlist),
+                  _showHideArea(msg),
+                  _buttonArea(context, existing, tlist, msg),
                 ],
               ),
             ),
@@ -69,16 +81,17 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Widget _intervalArea() {
+  Widget _intervalArea(BuildContext context, Messages msg) {
     return Align(
         alignment: Alignment.centerLeft,
         child: Container(
           width: 150,
-          child: intervalForm(intervalTextController),
+          child: intervalForm(intervalTextController, context, msg),
         ));
   }
 
-  Widget _optionFields(BuildContext context, bool show, bool existing) {
+  Widget _optionFields(
+      BuildContext context, bool show, bool existing, Messages msg) {
     return Visibility(
       maintainSize: false,
       maintainAnimation: true,
@@ -89,7 +102,7 @@ class AddTaskFormState extends State<AddTaskForm> {
           Row(
             children: <Widget>[
               Container(
-                child: Text('Use notice time'),
+                child: Text(msg.newTask['useNoticeTime']),
               ),
               Container(
                   child: Switch(
@@ -108,7 +121,7 @@ class AddTaskFormState extends State<AddTaskForm> {
               alignment: Alignment.centerLeft,
               child: Container(
                 width: 150,
-                child: timeForm(context, timeTextController, useTime),
+                child: timeForm(context, timeTextController, useTime, msg),
               )),
           Align(
               alignment: Alignment.centerLeft,
@@ -121,8 +134,11 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Widget _showHideArea() {
-    List<Text> showHidetext = [Text('Show options'), Text('Hide options')];
+  Widget _showHideArea(Messages msg) {
+    List<Text> showHidetext = [
+      Text(msg.newTask['showOptions']),
+      Text(msg.newTask['hideOptions'])
+    ];
     List<Icon> showHideIcon = [
       Icon(Icons.expand_more),
       Icon(Icons.expand_less)
@@ -143,7 +159,8 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Widget _buttonArea(BuildContext context, bool existing, TaskList tlist) {
+  Widget _buttonArea(
+      BuildContext context, bool existing, TaskList tlist, Messages msg) {
     return Container(
       child: Align(
         alignment: Alignment.centerRight,
@@ -156,13 +173,13 @@ class AddTaskFormState extends State<AddTaskForm> {
                 margin: const EdgeInsets.only(top: 5.0),
                 child: FlatButton(
                     onPressed: () => Navigator.pop(context, 'Cancel'),
-                    child: Text('Cancel')),
+                    child: Text(msg.newTask['cancel'])),
               ),
               Container(
                   width: 90,
                   height: 50,
                   margin: const EdgeInsets.only(top: 5.0),
-                  child: _saveButton(context, existing, tlist)),
+                  child: _saveButton(context, existing, tlist, msg)),
             ],
           ),
         ),
@@ -170,19 +187,19 @@ class AddTaskFormState extends State<AddTaskForm> {
     );
   }
 
-  Widget _saveButton(BuildContext context, bool existing, TaskList tList) {
-    List<String> saveButton = ["Add", 'Done'];
+  Widget _saveButton(
+      BuildContext context, bool existing, TaskList tList, Messages msg) {
     return FlatButton(
       color: Colors.blue,
       textTheme: ButtonTextTheme.primary,
       onPressed: () {
-        _saveTask(context, tList);
+        _saveTask(context, tList, msg);
       },
-      child: Text(saveButton[existing ? 1 : 0]),
+      child: Text(existing ? msg.newTask['done'] : msg.newTask['add']),
     );
   }
 
-  _saveTask(BuildContext context, TaskList tList) {
+  _saveTask(BuildContext context, TaskList tList, Messages msg) {
     var now = new DateTime.now();
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
@@ -209,10 +226,10 @@ class AddTaskFormState extends State<AddTaskForm> {
       newTask.day = int.parse(intervalTextController.text);
 
       if (widget.task == null) {
-        tList.add(newTask);
+        tList.add(newTask, context, msg);
       } else {
         newTask.id = widget.task.id;
-        tList.update(newTask);
+        tList.update(newTask, context, msg);
       }
       Navigator.pop(context, newTask.dueDate);
     }

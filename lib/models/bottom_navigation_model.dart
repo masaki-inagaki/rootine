@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ROOTINE/components/overdue.dart';
 import 'package:ROOTINE/components/show_list.dart';
+//import 'package:ROOTINE/language/app_localizations.dart';
 
 class BottomNavigationModel with ChangeNotifier {
   final List<Widget> options = [
     // Rootine(),
     OverDue(),
     ShowTodoList(),
-  ];
-
-  final List<String> appBarTitle = [
-    "Todo: Now",
-    "All Tasks",
   ];
 
   int _selectedIndex = 0;
@@ -26,7 +22,7 @@ class BottomNavigationModel with ChangeNotifier {
     return options[selectedIndex];
   }
 
-  String getAppBarTitle() {
-    return appBarTitle[selectedIndex];
+  int getSelectedIndex() {
+    return selectedIndex;
   }
 }
