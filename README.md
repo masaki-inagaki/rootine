@@ -1,6 +1,7 @@
 # ROOTINE
 
-Flutter project for the routine manager
+Flutter project for the routine manager.
+App is available in English and Japanese, your pull request for another new language is highly appreciated.
 
 ## Getting Started
 

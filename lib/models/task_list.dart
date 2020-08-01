@@ -47,11 +47,6 @@ class TaskList with ChangeNotifier {
     PushNotification(task: task).initializing(context, msg);
   }
 
-  // void toggleIsDone(Client task) async {
-  //   task.isDone = !task.isDone;
-  //   update(task);
-  // }
-
   Future remove(Task task) async {
     await repo.deleteTodoById(task.id);
     _fetchAll();
