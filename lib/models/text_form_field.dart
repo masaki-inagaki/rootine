@@ -32,7 +32,7 @@
 //       enabled: true,
 //       maxLength: maxLength,
 //       maxLengthEnforced: true,
-//       autovalidate: false,
+//       autovalidateMode: AutovalidateMode.always,
 //       autofocus: false,
 //       keyboardType: keyboardType,
 //       decoration: InputDecoration(

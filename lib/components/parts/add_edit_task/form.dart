@@ -22,7 +22,7 @@ Widget titleForm(TextEditingController controller, BuildContext context) {
     enabled: true,
     maxLength: 40,
     maxLengthEnforced: true,
-    autovalidate: false,
+    autovalidateMode: AutovalidateMode.always,
     autofocus: true,
     keyboardType: TextInputType.text,
     decoration: InputDecoration(
@@ -41,7 +41,7 @@ Widget intervalForm(
     enabled: true,
     maxLength: 3,
     maxLengthEnforced: true,
-    autovalidate: false,
+    autovalidateMode: AutovalidateMode.always,
     autofocus: false,
     keyboardType: TextInputType.number,
     decoration: InputDecoration(
@@ -73,7 +73,7 @@ Widget timeForm(BuildContext context, TextEditingController controller,
     enabled: useTime,
     maxLength: 5,
     maxLengthEnforced: true,
-    autovalidate: false,
+    autovalidateMode: AutovalidateMode.always,
     autofocus: false,
     keyboardType: TextInputType.number,
     decoration: InputDecoration(
@@ -119,7 +119,7 @@ Widget firstNoticeDate(
   return new TextFormField(
     controller: controller,
     enabled: true,
-    autovalidate: false,
+    autovalidateMode: AutovalidateMode.always,
     autofocus: false,
     decoration: InputDecoration(
         labelText: noticeDayTitle[existing ? 1 : 0],

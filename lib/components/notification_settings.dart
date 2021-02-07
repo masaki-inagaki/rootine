@@ -87,7 +87,7 @@ class NotificationSettingsState extends State<NotificationSettings> {
       controller: controller,
       maxLength: 5,
       maxLengthEnforced: true,
-      autovalidate: false,
+      autovalidateMode: AutovalidateMode.always,
       autofocus: false,
       keyboardType: TextInputType.number,
       decoration: InputDecoration(
